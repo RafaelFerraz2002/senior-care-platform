@@ -1,6 +1,6 @@
 # ADR-001: Escolha da stack
 
-- **Estado:** Proposto
+- **Estado:** Aceite
 - **Data:** 2026-10-14
 - **Ticket:** [#13](https://github.com/RafaelFerraz2002/senior-care-platform/issues/13) (épico [#1](https://github.com/RafaelFerraz2002/senior-care-platform/issues/1))
 - **Requisitos:** GL-16 (o que reaproveitar/mudar face ao MySenior)
