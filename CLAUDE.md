@@ -14,7 +14,11 @@ Plataforma SaaS multi-organização para gestão de respostas sociais para idoso
 2. Branch `tipo/#nr-descricao` (ex.: `feat/#42-registo-atividade`) a partir de `main`, atualizado.
 3. Tickets de arquitetura ou funcionalidades novas passam por brainstorming → desenho aprovado → plano, **antes** de escrever código.
 4. PR para `main` com `Closes #nr` e título em Conventional Commits (`feat(registo): …`, `docs(adr): …`). Entra por **squash merge**. A descrição do PR tem só "O que muda" (e um resumo, se ajudar) e `Closes #nr`. Sem secção "Como rever", sem rodapé "Generated with Claude Code" e sem link da sessão. Os commits também não levam a linha `Claude-Session`.
-5. Ao abrir o PR, o ticket passa para "Em revisão" no Project. Só o utilizador aprova o merge.
+5. Ao começar um ticket, passa para "Em curso"; ao abrir o PR, para "Em revisão". Só o utilizador aprova o merge.
+   Estados possíveis: `Backlog`, `Pronto`, `Em curso`, `Em revisão`, `Feito`.
+   ```sh
+   gh project item-edit 1 --owner RafaelFerraz2002 --url <url-do-issue> --field Status --value "Em curso"
+   ```
 6. **Nunca** fazer push direto para `main`, force push, nem merge sem pedido explícito.
 
 ## Regras que não se quebram
@@ -25,6 +29,6 @@ Plataforma SaaS multi-organização para gestão de respostas sociais para idoso
 
 ## Convenções
 
-- **Língua:** documentação, issues, PRs e mensagens ao utilizador em **português de Portugal**. Os nomes de domínio no código seguem o vocabulário do negócio (`utentes`, `registo-diario`), como no ADR-001.
+- **Língua:** documentação, issues, PRs e mensagens ao utilizador em **português de Portugal**. A convenção de nomes no código (português ou inglês, tabelas, variáveis) **ainda não está decidida**: é decidida no #17. Até lá, não escrever código.
 - **Decisões técnicas:** apresentar sempre o porquê **e** as alternativas rejeitadas. Escolher pelo que o projeto precisa.
 - **Comandos de build, teste e lint:** ainda não existem; são definidos no #17 (scaffolding) e acrescentados aqui nessa altura.
