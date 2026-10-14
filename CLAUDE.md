@@ -13,7 +13,7 @@ Plataforma SaaS multi-organização para gestão de respostas sociais para idoso
 1. Todo o trabalho nasce de um ticket. Se não houver ticket, cria-se um antes de começar.
 2. Branch `tipo/#nr-descricao` (ex.: `feat/#42-registo-atividade`) a partir de `main`, atualizado.
 3. Tickets de arquitetura ou funcionalidades novas passam por brainstorming → desenho aprovado → plano, **antes** de escrever código.
-4. PR para `main` com `Closes #nr` e título em Conventional Commits (`feat(registo): …`, `docs(adr): …`). Entra por **squash merge**. A descrição do PR tem só "O que muda" (e um resumo, se ajudar) e `Closes #nr`. Sem secção "Como rever", sem rodapé "Generated with Claude Code" e sem link da sessão. Os commits também não levam a linha `Claude-Session`.
+4. PR para `main` com `Closes #nr` e título em Conventional Commits (`feat(registo): …`, `docs(adr): …`). Entra por **squash merge**. A descrição do PR segue o template do ADR-004: "O que muda", a checklist "Pronto?" e `Closes #nr`. Sem secção "Como rever", sem rodapé "Generated with Claude Code" e sem link da sessão. Os commits também não levam a linha `Claude-Session`.
 5. Ao começar um ticket, passa para "Em curso"; ao abrir o PR, para "Em revisão". Só o utilizador aprova o merge.
    Estados possíveis: `Backlog`, `Pronto`, `Em curso`, `Em revisão`, `Feito`.
    ```sh

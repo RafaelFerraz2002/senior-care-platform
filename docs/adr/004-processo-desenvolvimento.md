@@ -70,21 +70,21 @@ O projeto é desenvolvido por um programador com apoio de IA, num repositório p
 4. O CI tem de ficar verde.
 5. Review: corre-se o `/code-review`, que deixa os comentários no PR, e o CodeRabbit comenta sozinho.
 6. Cada conversa é corrigida, ou respondida com a justificação, e depois marcada como resolvida.
-7. O dono aprova e faz o squash merge. O branch é apagado e o issue fecha e passa a **Feito**.
+7. O dono decide e faz o squash merge. É o merge que vale como aprovação, porque o GitHub não deixa o autor aprovar o próprio PR (secção 2). O branch é apagado, o issue fecha e a automação *Item closed* do Project passa-o a **Feito**.
 
 ### 2. Regras do GitHub
 
 | Decisão | Porquê | Rejeitado |
 |---|---|---|
 | **Ruleset no `main`: só por PR, sem aprovação obrigatória** | Garante que tudo passa por um PR. A aprovação não pode ser obrigatória porque o GitHub não deixa o autor aprovar o próprio PR, e não há outro programador. | **Aprovação obrigatória:** bloquearia todos os PRs. |
-| **Status checks do CI obrigatórios** | Nada entra com o build, o lint ou os testes partidos. | Checks opcionais: dependem de alguém reparar. |
+| **Status checks do CI obrigatórios, que correm sempre** | Nada entra com o build, o lint ou os testes partidos. Um check obrigatório nunca é filtrado por caminhos (`paths`/`paths-ignore`) no gatilho do workflow: um check que não corre fica à espera e bloqueia o merge. Se for preciso poupar tempo, a filtragem faz-se dentro do workflow e o check reporta sucesso. | **Checks opcionais:** dependem de alguém reparar. **Filtros de caminhos no gatilho:** bloqueiam os PRs só de docs. |
 | **Conversas resolvidas obrigatórias** (*Require conversation resolution before merging*) | Nenhum comentário do review fica sem resposta. Um comentário errado também se resolve, mas com a justificação escrita. | Ignorar comentários: o review deixa de servir. |
 | **Sem force push nem eliminação do `main`** | O histórico publicado não se reescreve. | — |
-| **Sem bypass, nem para o admin** | As regras valem sempre. Numa emergência, o dono desliga o ruleset e volta a ligá-lo, e isso fica no registo de auditoria. | **Bypass para o admin:** torna as regras opcionais sem deixar rasto claro. |
-| **Só squash merge**, com o título do commit = título do PR e a mensagem = corpo do PR | Um commit por ticket, com o porquê na mensagem. | Merge commit e rebase merge (ver Opções). |
+| **Bypass só para o admin e só em pull requests** (*For pull requests only*) | Numa emergência (por exemplo, o CI em baixo por uma falha externa), o dono pode fazer merge de um PR sem os checks, mas o push direto e o force push para o `main` continuam bloqueados. Cada bypass fica registado no Rule Insights e no registo de auditoria. Usa-se só em emergência, com a justificação escrita no PR. | **Sem bypass:** numa emergência obrigaria a desligar o ruleset inteiro, o que abre o `main` a tudo, incluindo force push. **Bypass sempre:** permitiria push direto para o `main`. |
+| **Só squash merge**, com o título do commit = título do PR e a mensagem = corpo do PR | Um commit por ticket, com o porquê na mensagem. O corpo vai inteiro (o que muda, a checklist marcada e o `Closes`) e fica como registo; pode editar-se no momento do merge. | Merge commit e rebase merge (ver Opções). |
 | **Apagar o branch depois do merge** | Não se acumulam branches mortos. | Apagar à mão. |
 
-O ruleset, o template e o CodeRabbit configuram-se no [#24](https://github.com/RafaelFerraz2002/senior-care-platform/issues/24). As definições de merge (só squash, título e mensagem, apagar o branch) ficam aplicadas no #21.
+O ruleset (com todas as regras desta tabela), o template e o CodeRabbit configuram-se no [#24](https://github.com/RafaelFerraz2002/senior-care-platform/issues/24). As definições de merge (só squash, título e mensagem, apagar o branch) ficam aplicadas no #21.
 
 ### 3. Template de PR
 
@@ -92,7 +92,7 @@ O ficheiro `.github/pull_request_template.md` é criado no [#24](https://github.
 
 ```markdown
 ## O que muda
-<!-- O quê e porquê, em poucas linhas. Isto vai para a mensagem do commit. -->
+
 
 ## Pronto?
 - [ ] Critérios de aceitação do ticket cumpridos
@@ -106,6 +106,7 @@ Closes #
 
 - A linha "Sem dados reais nem segredos" está na checklist porque o repositório é público. É a regra que mais custa se falhar, por isso tem um visto explícito em cada PR.
 - Um PR sem código marca "n/a" na linha dos testes, sem a apagar.
+- O corpo inteiro do PR vai para a mensagem do commit, por isso o template não leva comentários HTML: ficariam no histórico do `main`.
 - **Rejeitado:** um template diferente para cada tipo de PR (feat, docs, fix), que é mais manutenção do que ganho com um só programador; e uma secção "Como testar", porque os passos de teste ficam no CI e nos testes, não no texto do PR.
 
 ### 4. Definição de pronto
@@ -117,7 +118,7 @@ Um ticket está pronto quando:
 3. A documentação afetada está atualizada.
 4. Não tem dados reais nem segredos.
 5. Passou pelo review e tem todas as conversas resolvidas.
-6. O dono aprovou e fez o merge, e o issue está em **Feito**.
+6. O dono fez o merge, que vale como aprovação, e o issue está em **Feito**.
 
 ### 5. Transição
 
@@ -141,8 +142,8 @@ O processo completo depende de peças que ainda não existem. Até lá:
 
 **Negativas e riscos**
 - **Mudanças pequenas também passam pelo fluxo completo.** Aceita-se o custo em troca de não haver exceções.
-- **O review por IA pode falhar**, deixando passar erros ou dando falsos positivos. A aprovação do dono continua a ser obrigatória, e a ferramenta é reavaliada no [#26](https://github.com/RafaelFerraz2002/senior-care-platform/issues/26).
-- **Sem bypass, um ruleset mal configurado pode bloquear o `main`.** O dono desliga e volta a ligar o ruleset, o que fica no registo de auditoria.
+- **O review por IA pode falhar**, deixando passar erros ou dando falsos positivos. A decisão do dono de fazer o merge continua a ser obrigatória, e a ferramenta é reavaliada no [#26](https://github.com/RafaelFerraz2002/senior-care-platform/issues/26).
+- **O bypass pode ser usado por comodidade.** É só em PRs, fica registado e exige justificação escrita no PR; um uso sem emergência é uma falha do processo.
 - **Até ao [#24](https://github.com/RafaelFerraz2002/senior-care-platform/issues/24), as regras dependem só de disciplina.**
 
 **Ligações a outros ADRs**
