@@ -1,6 +1,6 @@
 # ADR-004: Processo de desenvolvimento e code review
 
-- **Estado:** Proposto
+- **Estado:** Aceite
 - **Data:** 2026-10-14
 - **Ticket:** [#21](https://github.com/RafaelFerraz2002/senior-care-platform/issues/21)
 
