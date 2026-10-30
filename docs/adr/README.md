@@ -14,8 +14,8 @@ Um ADR regista **uma decisão de arquitetura**: o contexto, as opções que fora
 | ADR | Título | Estado | Ticket |
 |---|---|---|---|
 | [001](001-stack.md) | Escolha da stack | Aceite | [#13](https://github.com/RafaelFerraz2002/senior-care-platform/issues/13) |
-| [002](002-multi-tenancy.md) | Estratégia multi-organização | Proposto | [#14](https://github.com/RafaelFerraz2002/senior-care-platform/issues/14) |
-| 003 | Autenticação web + PIN em dispositivo partilhado | Por escrever | [#15](https://github.com/RafaelFerraz2002/senior-care-platform/issues/15) |
+| [002](002-multi-tenancy.md) | Estratégia multi-organização | Aceite | [#14](https://github.com/RafaelFerraz2002/senior-care-platform/issues/14) |
+| [003](003-auth.md) | Autenticação web + PIN em dispositivo partilhado | Proposto | [#15](https://github.com/RafaelFerraz2002/senior-care-platform/issues/15) |
 | [004](004-processo-desenvolvimento.md) | Processo de desenvolvimento e code review | Aceite | [#21](https://github.com/RafaelFerraz2002/senior-care-platform/issues/21) |
 | 005 | Estratégia de testes | Por escrever | [#22](https://github.com/RafaelFerraz2002/senior-care-platform/issues/22) |
 | 006 | Proteção de dados, RGPD e segurança | Por escrever | [#23](https://github.com/RafaelFerraz2002/senior-care-platform/issues/23) |
