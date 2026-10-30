@@ -78,7 +78,7 @@ Em qualquer opção, **uma sessão já aberta continua a registar sem rede**, pa
   - **acesso ao Registo Diário:** PIN.
 
   Uma ajudante pode ter só o PIN, sem email. Uma diretora pode ter só a Gestão.
-- O **email é único dentro da organização** e é o utilizador da Gestão. *Diferente do MySenior,* que usa um nome de utilizador: o email já é preciso para recuperar a senha, e assim há um dado a menos para decorar.
+- Na Gestão, **o email faz de nome de utilizador** e, como manda o ADR-002 (multi-organização), é **único dentro da organização** (não na plataforma). *Diferente do MySenior,* que usa um nome de utilizador à parte: o email já é preciso para recuperar a senha, e assim há um dado a menos para decorar. As contas só com PIN não têm nome de utilizador, porque não entram na Gestão.
 - O **acesso ao Registo Diário é por local**: a pessoa só aparece e só regista nos locais onde trabalha.
 - **Administrador** é um papel próprio, não a soma das permissões. Só ele convida pessoas para a Gestão, atribui permissões e papéis, e repõe a verificação em dois passos de outra pessoa. Quando só existe **um**, a Gestão mostra-lhe um aviso permanente: se perder o acesso, a recuperação depende da equipa da plataforma, por isso deve nomear um segundo.
 - **Permissões por local** (ADR-002), atribuídas pelo administrador. As que este ADR usa:
@@ -89,7 +89,9 @@ Em qualquer opção, **uma sessão já aberta continua a registar sem rede**, pa
 
 **Entrada**
 1. Código da organização, email e senha. Uma função restrita (secção 4) traduz o código no identificador da organização; tudo o resto corre dentro da organização, com RLS.
-2. Código de 6 dígitos da aplicação autenticadora, exceto num dispositivo marcado como "lembrar durante 30 dias".
+2. Código de 6 dígitos da aplicação autenticadora, exceto num dispositivo marcado como "lembrar durante 30 dias". A senha é pedida sempre.
+   - "Lembrar" guarda no navegador um token próprio daquela conta (só o resumo fica na base). Os dispositivos lembrados aparecem nos dados da pessoa e podem ser esquecidos um a um.
+   - **Todos deixam de valer** quando a senha muda ou é reposta, quando a verificação em dois passos é reposta e em "Terminar sessão em todos os dispositivos".
 3. Qualquer erro dá a mesma mensagem, "dados incorretos", sem dizer se o código, o email ou a senha existem.
 
 **Convites e primeira conta**
@@ -123,15 +125,16 @@ Em qualquer opção, **uma sessão já aberta continua a registar sem rede**, pa
 #### 3.1 Registo do tablet (AD-05)
 
 1. Na Gestão, alguém com **gerir tablets** carrega em "Registar tablet", dá-lhe um nome ("Tablet piso 1") e escolhe **um ou mais locais**, um deles principal.
-2. Aparece um **QR code** e, ao lado, um **código de ativação** curto para escrever à mão (para tablets sem câmara, como no MySenior). Ambos servem uma única vez e expiram em 10 minutos.
-3. No Registo Diário **já instalado** no tablet (ver riscos), lê-se o QR ou escreve-se o código. O tablet recebe uma **chave de dispositivo** própria.
+2. Aparece um **QR code** e, ao lado, um **código de ativação** de 8 caracteres para escrever à mão (para tablets sem câmara, como no MySenior). Ambos servem uma única vez e expiram em 10 minutos. O QR já leva o código da organização; à mão, escreve-se o código da organização e o código de ativação.
+3. No Registo Diário **já instalado** no tablet (ver riscos), lê-se o QR ou escrevem-se os códigos. O tablet recebe uma **chave de dispositivo** própria. Os códigos de ativação errados contam para as esperas por endereço de rede e por organização (como as tentativas da Gestão).
 4. Fica registado quem registou o tablet e quando. A Gestão mostra a lista de tablets com a última utilização.
 
 - A senha da Gestão **nunca** é escrita no tablet.
   - *Rejeitado:* registar o tablet entrando com a conta do coordenador no próprio tablet. A senha ficaria exposta num dispositivo partilhado, e a sessão dele podia ficar aberta.
 - **O que a chave de dispositivo permite sozinha, sem ninguém com sessão:** ver a lista de nomes e fotografias do ecrã de entrada (dos locais do tablet), enviar a fila e saber se foi desativado. **Nunca** descarrega dados de utentes; isso exige a sessão de uma pessoa (3.5).
-- **Desativar tablet** (perdido, roubado, avariado): um clique na Gestão. Com rede, deixa de abrir sessões de imediato. A chave serve depois **uma única vez**, nos 7 dias seguintes, para entregar a fila (ver 3.6) e receber a ordem de apagar tudo; a seguir, ou passado esse prazo, é recusada.
-- Um tablet **30 dias sem uso** tem de ser registado de novo.
+- **Desativar tablet** (perdido, roubado, avariado): um clique na Gestão. Com rede, deixa de abrir sessões e de descarregar dados de imediato. Durante os 7 dias seguintes, a chave serve **só para entregar a fila** (ver 3.6), com as tentativas que forem precisas; quando o servidor confirma que recebeu tudo, o tablet apaga o que tinha. Passados os 7 dias, a chave é recusada.
+- Um tablet **30 dias sem uso** deixa de abrir sessões e tem de ser registado de novo; até lá, a chave antiga também serve só para entregar a fila.
+- **O tablet nunca apaga registos por enviar sem o servidor confirmar que os recebeu.** Se já não conseguir entregá-los (passou o prazo), mostra um aviso para ser registado de novo; ao registar, a fila é entregue e fica "por confirmar".
 - **Locais do tablet:** quem entra só vê os utentes dos locais que estão **ao mesmo tempo** no tablet e nas permissões da pessoa. Ninguém ganha acesso a mais por usar outro tablet. Cada local a mais põe mais dados no tablet, por isso escolhem-se só os necessários.
 - *Recomendação operacional, fora do código:* prender o tablet na aplicação ("Acesso guiado" no iPad, "Afixação de ecrã" no Android).
 
@@ -150,21 +153,24 @@ Em qualquer opção, **uma sessão já aberta continua a registar sem rede**, pa
 - **PINs proibidos:** iguais (0000, 1111…), sequências (1234, 4321…) e o PIN anterior.
 - Guardado com **Argon2id**. Com rede, **quem verifica é sempre o servidor**.
 - **Bloqueio por pessoa:** 5 PINs errados bloqueiam 5 minutos; os bloqueios seguintes duram 15 minutos e depois 1 hora, **sem passar de 1 hora** (de noite não há quem desbloqueie, por isso ninguém fica bloqueada mais do que isso). Um PIN certo repõe a contagem. Quem tem **gerir equipa** pode desbloquear logo.
-- **Travão por tablet:** 10 PINs errados no mesmo tablet em 15 minutos, somando todas as pessoas, pausam as entradas **nesse tablet** durante 15 minutos (depois 1 hora). Uso normal não chega lá; serve para quem percorre a lista de nomes a tentar PINs. Fica no histórico de segurança, e quem tem **gerir tablets** pode retomar logo.
-  - *Porquê é seguro com 4 dígitos:* com os dois limites, quem tentasse adivinhar durante uma noite inteira teria cerca de uma centena de tentativas em 10 000 combinações, espalhadas por todas as pessoas, e deixava rasto no histórico.
+- **Travão por tablet:** 10 PINs errados no mesmo tablet em 15 minutos, somando todas as pessoas, pausam **novas entradas** nesse tablet durante 5 minutos, e as pausas seguintes durante 15 minutos, **sem passar de 15 minutos** (de noite não há quem retome, e a equipa tem de conseguir trabalhar). Quem já tem sessão aberta não é afetado. Uso normal não chega lá; serve para quem percorre a lista de nomes a tentar PINs. Fica no histórico de segurança, a Gestão avisa quem tem **gerir tablets**, e quem tem essa permissão pode retomar logo.
+  - *Porquê é aceitável com 4 dígitos:* só se tenta num tablet registado, dentro da instituição. Com os dois limites, quem tentasse adivinhar uma noite inteira teria umas 300 tentativas, espalhadas pelas pessoas: cerca de 3% de acertar numa conta qualquer, deixando rasto no histórico e um aviso de manhã.
 - Os contadores ficam no Postgres, por isso sobrevivem a reinícios da API.
 - **Esqueci-me do PIN:** quem tem **gerir equipa** carrega em "Repor PIN" na Gestão, de qualquer sítio (incluindo do telemóvel, fora da instituição). O sistema gera um PIN provisório, mostrado uma vez, com troca obrigatória na entrada seguinte. Fica no histórico de segurança.
+  - *Limite assumido:* quem repõe conhece o PIN provisório e, em teoria, pode entrar antes dela e trocá-lo. Como na criação, não há forma de o evitar sem um canal direto para a ajudante (email ou telemóvel), que ela pode não ter. Mitiga-se por **deteção**: na entrada seguinte, a ajudante vê "O teu PIN foi reposto por X às 03:10 e trocado às 03:12"; se não foi ela, ela própria fica sem conseguir entrar e pede nova reposição; e tudo fica no histórico.
   - *Rejeitado:* recuperar o PIN por email ou SMS sem responsável. Muitas ajudantes não têm email profissional, e obrigaria a guardar contactos pessoais. Volta a pensar-se com os telemóveis pessoais.
   - *Rejeitado:* um "PIN de supervisor" no tablet que desbloqueia qualquer conta. Seria o alvo mais valioso do sistema, num dispositivo partilhado.
 - **Saída da instituição:** desativar a funcionária na Gestão. Com rede, o PIN deixa de funcionar de imediato.
+- **Mudar ou repor o PIN, desativar a pessoa ou terminar as sessões dela revoga todas as suas chaves de registo** (3.4), com a hora da revogação. O tablet apaga-as quando voltar a falar com o servidor, e o servidor não aceita automaticamente registos assinados com elas e datados depois da revogação.
 
 #### 3.4 Sessão no tablet
 
 - Cada pessoa abre a **sua** sessão com o PIN. Fica presa àquele tablet: não serve noutro dispositivo.
 - Termina ao fim de **2 minutos sem toques** e no máximo 12 horas depois de abrir. O botão **Sair** está sempre visível.
 - Ao sair, aplica-se a regra do ADR-002 (multi-organização): limpa-se a cache do ecrã, e a fila de envio fica.
-- **Chave de registo:** quando uma pessoa entra **com rede**, o servidor gera uma chave secreta só para aquela pessoa, naquele tablet, válida **14 horas** (turnos até 12 horas, mais margem). O servidor guarda uma cópia durante esse tempo.
-  - No tablet, a chave fica **cifrada com o PIN** (através de uma função de resumo lenta). Só se usa depois de alguém marcar o PIN certo.
+- **Chave de registo:** quando uma pessoa entra **com rede**, o tablet gera um **par de chaves** (WebCrypto) só para aquela pessoa, naquele tablet. A parte pública vai para o servidor, que a regista com a pessoa, o tablet e uma validade de **14 horas** (turnos até 12 horas, mais margem), contada pelo relógio do servidor.
+  - A parte privada **nunca sai do tablet** e fica lá **cifrada com o PIN** (através de uma função de resumo lenta). Só se usa depois de alguém marcar o PIN certo.
+  - O servidor guarda a parte pública **para sempre**, por isso consegue verificar um registo que chegue dias depois. Como só tem a parte pública, quem leia a base de dados não consegue fazer registos em nome de ninguém.
   - **Cada registo é assinado com a chave de registo de quem o fez**, e leva o ID gerado no cliente, o utente, a hora e se foi feito offline.
   - **A autora é a dona da chave que assinou, decidida pelo servidor.** Um nome escrito pelo cliente nunca conta, tal como a organização no ADR-002. Quem tem só a chave do tablet não consegue fazer registos em nome de ninguém.
 
@@ -174,9 +180,10 @@ Em qualquer opção, **uma sessão já aberta continua a registar sem rede**, pa
 2. A chave **apaga-se** do tablet:
    - ao fim das 14 horas;
    - ao fim de 5 PINs errados offline para essa pessoa (ela espera pela rede);
-   - quando o tablet volta a ligar-se e o servidor diz que a pessoa ou o tablet foram desativados.
+   - quando o tablet volta a ligar-se e o servidor diz que a chave foi revogada (PIN mudado ou reposto, pessoa ou tablet desativados, sessões terminadas).
 3. Quem não tem chave válida nesse tablet espera pela rede.
-4. Para se poder trabalhar offline, o tablet guarda também **o mínimo para registar** dos utentes (o que é exatamente decide-se no ticket do Registo Diário).
+4. **O relógio do tablet não é de confiança.** O tablet guarda a hora mais recente que já viu (das respostas do servidor e do próprio relógio) e recusa entradas offline se o relógio estiver atrás dessa hora. Quem atrasar o relógio para prolongar a janela é apanhado aqui ou, no servidor, pelas regras de 3.6.
+5. Para se poder trabalhar offline, o tablet guarda também **o mínimo para registar** dos utentes (o que é exatamente decide-se no ticket do Registo Diário).
    - Esses dados descarregam-se **só com a sessão de uma pessoa**, nunca só com a chave do tablet.
    - Cada pessoa descarrega apenas os utentes dos **seus** locais que também são locais do tablet. O tablet guarda a soma do que as pessoas com chave válida podem ver, e mostra a cada uma só os dela.
    - Sem nenhuma chave válida, estes dados apagam-se.
@@ -190,14 +197,18 @@ A função de resumo no navegador (PBKDF2 do WebCrypto ou Argon2id em WebAssembl
 *Ponto deixado em aberto pelo ADR-002 (multi-organização).*
 
 - A fila é enviada pelo tablet com a **chave de dispositivo**, mesmo sem ninguém com sessão aberta.
-- O servidor aceita um registo quando:
-  - o tablet está ativo e pertence à organização do registo;
-  - a assinatura corresponde a uma chave de registo emitida para aquele tablet;
-  - a hora do registo cai **dentro da validade dessa chave** e não está no futuro em relação à hora de chegada (com 5 minutos de tolerância). Um relógio errado no tablet só consegue mexer a hora dentro desta janela;
+- O servidor aceita um registo automaticamente quando:
+  - o tablet pertence à organização do registo e estava ativo à hora do registo;
+  - a assinatura confere com a parte pública de uma chave de registo daquele tablet;
+  - a hora do registo cai **dentro da validade dessa chave** (relógio do servidor), antes de uma eventual revogação, e não está no futuro em relação à hora de chegada (5 minutos de tolerância);
+  - o registo chega até 24 horas depois do fim da validade da chave. Com Wi-Fi fiável, uma fila normal chega muito antes; um registo mais tardio pode vir de um relógio atrasado de propósito;
   - a autora estava ativa a essa hora, e tem hoje permissão no local do utente.
 - O que não cumpre estas regras **não se deita fora**: fica **"por confirmar"**, visível na Gestão para quem tem **gerir equipa** naquele local, que o aceita ou rejeita. Fica no histórico quem decidiu.
-- Isto inclui a fila de um **tablet desativado**: é recebida como "por confirmar" e, só depois, o tablet apaga o que tinha.
-- O reenvio é seguro porque cada registo tem um ID gerado no cliente e a API ignora duplicados (ADR-001, escolha da stack).
+- Isto inclui a fila de um **tablet desativado**: os registos datados antes da desativação seguem as regras acima; os outros ficam "por confirmar".
+- **Duplicados:** o reenvio é seguro porque cada registo tem um ID gerado no cliente (ADR-001, escolha da stack). Se chegar de novo um registo com um ID que já existe:
+  - igual e já aceite: ignora-se;
+  - igual, mas o que existe está "por confirmar" e o novo cumpre as regras: o existente passa a aceite;
+  - com conteúdo diferente: os dois ficam "por confirmar", lado a lado, para um responsável decidir.
 
 ### 4. Por baixo: tokens, cookies e funções restritas
 
@@ -209,7 +220,8 @@ A função de resumo no navegador (PBKDF2 do WebCrypto ou Argon2id em WebAssembl
   - resumo da chave de dispositivo → organização, tablet.
 
   Procurar o email, verificar a senha, o PIN e o código de dois passos, e tudo o que vem depois, corre **dentro da organização**, pelo `comOrganizacao`, com RLS.
-- **Tabelas:** contas, sessões, tablets, chaves de registo emitidas, contadores de tentativas, convites, códigos de recuperação e histórico de segurança são **tabelas da organização**, com RLS. A exceção são os contadores por endereço de rede antes de se saber a organização: tabela da plataforma, sem dados das organizações, apagada ao fim de 24 horas.
+- **Os outros códigos de uso único levam o código da organização** e por isso não precisam de função própria: o link de convite, o link de recuperação de senha e o QR de ativação trazem-no no endereço; a ativação à mão pede-o. A API traduz o código com a primeira função acima e procura o token **dentro da organização**, com RLS. O token de "lembrar este dispositivo" só se verifica depois da senha, quando a organização já é conhecida.
+- **Tabelas:** contas, sessões, tablets, chaves de registo (partes públicas e revogações), dispositivos lembrados, contadores de tentativas, convites, códigos de ativação, pedidos de recuperação, códigos de recuperação e histórico de segurança são **tabelas da organização**, com RLS. A exceção são os contadores por endereço de rede antes de se saber a organização: tabela da plataforma, sem dados das organizações, apagada ao fim de 24 horas.
 - **Segredos da aplicação autenticadora:** cifrados na base, com a chave numa variável de ambiente. Os códigos de recuperação guardam-se como resumo.
 - **Contas da equipa da plataforma** (backoffice da plataforma, ADR-002): mesma receita da Gestão (senha, aplicação autenticadora obrigatória, sessões na base), mas com tabelas de contas e sessões **da plataforma**, uma entrada própria e o papel plataforma. Uma sessão da plataforma nunca serve na Gestão de uma organização, nem dá acesso aos dados dela.
 
@@ -229,12 +241,14 @@ O tempo de conservação decide-se no ADR-006 (RGPD e segurança).
 O ADR-005 (estratégia de testes) decide onde vivem e como correm. Têm de existir:
 1. **Organização da sessão:** uma organização enviada pelo cliente (cabeçalho, parâmetro ou corpo) é ignorada.
 2. **Cancelamento imediato:** desativar uma pessoa ou um tablet, ou terminar as sessões, faz o pedido seguinte falhar.
-3. **Bloqueio do PIN:** a 5.ª tentativa errada bloqueia só essa pessoa, durante o tempo previsto, nunca mais de 1 hora, e sobrevive a um reinício da API. A 10.ª tentativa errada no mesmo tablet em 15 minutos pausa esse tablet.
-4. **Chave de registo:** expira às 14 horas e apaga-se à 5.ª tentativa errada offline.
-5. **Fila:** um registo bem assinado e dentro da validade da chave é aceite com a autora da chave; um registo com outro nome escrito pelo cliente, assinatura errada ou hora fora da janela fica "por confirmar", nunca é descartado.
-6. **Permissões:** quem tem **gerir equipa** num local não consegue atuar sobre alguém com acesso à Gestão ou com locais fora dos seus.
-7. **Cookies:** têm `HttpOnly`, `Secure` e `SameSite`; um pedido de alteração com `Origin` estranho é recusado.
-8. **Funções restritas:** devolvem só identificadores (coberto também pelo teste de catálogo do ADR-002).
+3. **Bloqueio do PIN:** a 5.ª tentativa errada bloqueia só essa pessoa, durante o tempo previsto, nunca mais de 1 hora, e sobrevive a um reinício da API. A 10.ª tentativa errada no mesmo tablet em 15 minutos pausa novas entradas nesse tablet, nunca mais de 15 minutos.
+4. **Chave de registo:** expira às 14 horas (relógio do servidor), apaga-se à 5.ª tentativa errada offline e é revogada ao mudar ou repor o PIN, ao desativar a pessoa e ao terminar as sessões.
+5. **Fila:** um registo bem assinado e dentro da validade da chave é aceite com a autora da chave, mesmo que chegue dias depois. Ficam "por confirmar", nunca descartados: outro nome escrito pelo cliente, assinatura errada, hora fora da janela ou depois da revogação, e chegada mais de 24 horas depois do fim da validade.
+6. **Duplicados:** um registo aceite não é tapado nem alterado por um reenvio com o mesmo ID; um "por confirmar" passa a aceite se chegar a versão bem assinada.
+7. **Revogação dos dispositivos lembrados:** mudar ou repor a senha, repor a verificação em dois passos ou terminar todas as sessões volta a pedir o código em todos os dispositivos.
+8. **Permissões:** quem tem **gerir equipa** num local não consegue atuar sobre alguém com acesso à Gestão ou com locais fora dos seus.
+9. **Cookies:** têm `HttpOnly`, `Secure` e `SameSite`; um pedido de alteração com `Origin` estranho é recusado.
+10. **Funções restritas:** devolvem só identificadores (coberto também pelo teste de catálogo do ADR-002).
 
 ## Consequências
 
@@ -251,6 +265,9 @@ O ADR-005 (estratégia de testes) decide onde vivem e como correm. Têm de exist
 |---|---|
 | Alguém copiar os dados do tablet e descobrir os PINs com chave de registo | Chaves só de quem entrou nas últimas 14 horas, apagadas ao 5.º erro offline. Recomendação de prender o tablet na aplicação. |
 | Alguém bloquear de propósito uma colega à noite, errando o PIN dela | O bloqueio nunca passa de 1 hora e fica no histórico. O travão por tablet limita a repetição. |
+| O travão pausar o tablet de noite, sem ninguém para o retomar | Pausas de 5 e depois 15 minutos, nunca mais; quem já tem sessão continua; aviso na Gestão a quem tem **gerir tablets**. |
+| Quem repõe um PIN entrar primeiro com o provisório | Deteção: a ajudante vê quem repôs e quando, fica sem conseguir entrar se não foi ela, e tudo fica no histórico. |
+| Relógio do tablet atrasado de propósito para prolongar a entrada offline | O tablet recusa um relógio atrás da hora mais recente que viu; o servidor conta a validade pelo seu relógio e põe "por confirmar" o que chega mais de 24 horas depois. |
 | Funcionária desativada entra offline até ao fim da janela de 14 horas | Aceite. Com rede, o corte é imediato; os registos dela depois da desativação ficam "por confirmar". |
 | Esquecer o PIN de noite sem ninguém contactável | Aceite por agora: espera pela manhã. Registar mais tarde com a hora real fica para o ticket do Registo Diário. |
 | Único administrador perde o acesso | Aviso permanente para nomear um segundo; reposição manual pela plataforma (ADR-006, RGPD e segurança). |
