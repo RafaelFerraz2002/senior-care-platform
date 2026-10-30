@@ -1,6 +1,6 @@
 # ADR-002: Estratégia multi-organização
 
-- **Estado:** Proposto
+- **Estado:** Aceite
 - **Data:** 2026-10-21
 - **Ticket:** [#14](https://github.com/RafaelFerraz2002/senior-care-platform/issues/14) (épico [#1](https://github.com/RafaelFerraz2002/senior-care-platform/issues/1))
 - **Requisitos:** GL-01 (código do local no login), AD-02 (dados da organização), AD-05 (dispositivos), AD-09 (chaves de API), AD-10 (faturação por utente ativo), AD-12 (mapa de instituições), GL-07 (novidades do fornecedor), GL-13 (onboarding e subscrição)
