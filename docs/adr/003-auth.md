@@ -1,6 +1,6 @@
 # ADR-003: Autenticação na Gestão e PIN no Registo Diário
 
-- **Estado:** Proposto
+- **Estado:** Aceite
 - **Data:** 2026-10-30
 - **Ticket:** [#15](https://github.com/RafaelFerraz2002/senior-care-platform/issues/15) (épico [#1](https://github.com/RafaelFerraz2002/senior-care-platform/issues/1))
 - **Requisitos:** GL-01 (login com código + utilizador + senha), GL-02 (recuperação de senha), GL-15 (dados de acesso: senha e PIN), RD-02 (entrada no Registo Diário por PIN de 4 dígitos), AD-05 (dispositivos do Registo Diário)
