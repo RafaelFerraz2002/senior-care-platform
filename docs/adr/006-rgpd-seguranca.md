@@ -1,6 +1,6 @@
 # ADR-006: Proteção de dados, RGPD e segurança
 
-- **Estado:** Proposto
+- **Estado:** Aceite
 - **Data:** 2026-10-30
 - **Ticket:** [#23](https://github.com/RafaelFerraz2002/senior-care-platform/issues/23) (épico [#1](https://github.com/RafaelFerraz2002/senior-care-platform/issues/1))
 - **Requisitos:** GL-12 (registo da navegação), AD-06 (auditoria de entradas), AD-07 (auditoria de Fichas de Acompanhamento), AD-08 (exportações de dados), RD-13 (Ficha de Acompanhamento auditada)

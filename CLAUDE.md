@@ -25,7 +25,8 @@ Plataforma SaaS multi-organização para gestão de respostas sociais para idoso
 
 - **Nunca pôr dados reais** (utentes, funcionários, saúde da Coophousing ou do MySenior) no repositório, em seeds, em testes nem em issues. O repositório é público. Os dados de exemplo são sempre fictícios.
 - **Nunca pôr segredos** (passwords, chaves, tokens) em ficheiros versionados. Só em variáveis de ambiente.
-- Dados de saúde: qualquer funcionalidade que guarde, mostre ou exporte dados pessoais segue o ADR-006 (RGPD), quando existir. Na dúvida, pergunta-se.
+- Dados de saúde: qualquer funcionalidade que guarde, mostre ou exporte dados pessoais segue o ADR-006 (RGPD). Na dúvida, pergunta-se.
+- **Nunca criar uma exceção a um check por iniciativa própria** (ADR-005, testes): subir um valor de referência, acrescentar um `v8 ignore`, pôr um teste em quarentena. Pergunta-se primeiro ao utilizador, com o motivo. Os testes de segurança e RGPD não têm exceção.
 
 ## Convenções
 
