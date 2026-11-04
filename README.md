@@ -50,6 +50,8 @@ O `pnpm dev` sobe os serviços (`docker compose up -d --wait`), a API e as duas 
 
 As portas dos serviços no anfitrião (PostgreSQL 5440, MinIO 9010 e 9011, Mailpit 1035 e 8035) e a da API (`API_PORT`) mudam-se no `.env`, se estiverem ocupadas. Se mudar a `API_PORT`, o endereço de estado da API muda com ela. Se mudar a `POSTGRES_PORT`, mude também a porta no `DATABASE_URL`: a API não a lê da `POSTGRES_PORT`.
 
+O `VITE_SENTRY_DSN` das apps web vem do ambiente do build (`VITE_SENTRY_DSN=… pnpm build`): o Vite lê o `.env` da pasta de cada app e não o da raiz, e o Turborepo só o passa ao build porque `VITE_*` está declarado em `turbo.json`.
+
 Os serviços do `docker compose` **ficam a correr** quando se pára o `pnpm dev`. Para os parar: `docker compose down`.
 
 ## Comandos
