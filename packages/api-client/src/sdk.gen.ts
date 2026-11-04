@@ -2,7 +2,7 @@
 
 import { client } from './client.gen.js';
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client/index.js';
-import type { GetSaudeData, GetSaudeResponses } from './types.gen.js';
+import type { GetSaudeData, GetSaudeErrors, GetSaudeResponses } from './types.gen.js';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -21,4 +21,4 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 /**
  * Estado da API e da base de dados
  */
-export const getSaude = <ThrowOnError extends boolean = false>(options?: Options<GetSaudeData, ThrowOnError>): RequestResult<GetSaudeResponses, unknown, ThrowOnError> => (options?.client ?? client).get<GetSaudeResponses, unknown, ThrowOnError>({ url: '/saude', ...options });
+export const getSaude = <ThrowOnError extends boolean = false>(options?: Options<GetSaudeData, ThrowOnError>): RequestResult<GetSaudeResponses, GetSaudeErrors, ThrowOnError> => (options?.client ?? client).get<GetSaudeResponses, GetSaudeErrors, ThrowOnError>({ url: '/saude', ...options });

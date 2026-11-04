@@ -1,0 +1,42 @@
+# Serviços de desenvolvimento. Os valores vêm do .env (copiar do .env.example).
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-scp}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?definir no .env}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:?definir no .env}
+    ports:
+      - '${POSTGRES_PORT:-5440}:5432'
+    volumes:
+      - postgres-dados:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-scp}']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  minio:
+    # A imagem oficial minio/minio já não está disponível nos registos públicos; esta é a última versão
+    # estável da Bitnami (arquivo "legacy"). Só para desenvolvimento local; rever antes de produção.
+    image: bitnamilegacy/minio:2025.7.23-debian-12-r5
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?definir no .env}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?definir no .env}
+    ports:
+      - '${MINIO_API_PORT:-9010}:9000'
+      - '${MINIO_CONSOLE_PORT:-9011}:9001'
+    volumes:
+      - minio-dados:/bitnami/minio/data
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - '${MAILPIT_SMTP_PORT:-1035}:1025'
+      - '${MAILPIT_UI_PORT:-8035}:8025'
+
+volumes:
+  postgres-dados:
+  minio-dados:

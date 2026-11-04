@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
-    "gerar:openapi": "node dist/openapi/gerar-openapi.js"
+    "gerar:openapi": "node dist/openapi/gerar-openapi.js",
+    "test:integracao": "vitest run --config vitest.integracao.config.ts"
   },
   "dependencies": {
     "@nestjs/common": "12.3.2",
@@ -17,13 +18,17 @@
     "@nestjs/platform-express": "12.3.2",
     "@nestjs/swagger": "12.1.0",
     "@scp/shared": "workspace:*",
+    "pg": "8.23.1",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.2"
   },
   "devDependencies": {
     "@scp/config": "workspace:*",
     "@swc/core": "1.16.21",
+    "@testcontainers/postgresql": "12.2.1",
     "@types/node": "26.6.6",
+    "@types/pg": "8.23.1",
+    "testcontainers": "12.2.1",
     "typescript": "~6.0.3",
     "unplugin-swc": "2.0.0",
     "vitest": "5.1.0"

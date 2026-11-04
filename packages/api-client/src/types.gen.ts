@@ -16,9 +16,18 @@ export type GetSaudeData = {
     url: '/saude';
 };
 
+export type GetSaudeErrors = {
+    /**
+     * A API responde, mas a base de dados não.
+     */
+    503: SaudeResposta;
+};
+
+export type GetSaudeError = GetSaudeErrors[keyof GetSaudeErrors];
+
 export type GetSaudeResponses = {
     /**
-     * A API está a responder.
+     * A API e a base de dados estão a responder.
      */
     200: SaudeResposta;
 };

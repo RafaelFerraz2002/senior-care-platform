@@ -1,0 +1,44 @@
+import { fileURLToPath } from 'node:url';
+
+import { PostgreSqlContainer } from '@testcontainers/postgresql';
+
+const initDir = fileURLToPath(new URL('../../../docker/postgres/init', import.meta.url));
+
+const baseDeDados = 'scp_teste';
+const passwordSuperutilizador = 'superutilizador-de-teste';
+const passwordApp = 'app-de-teste';
+
+export interface PostgresDeTeste {
+  /** URL de ligação com o papel `app` (não o superutilizador). */
+  url: string;
+  stop(): Promise<void>;
+}
+
+/**
+ * Arranca um Postgres 17 descartável com o mesmo script de arranque do docker compose
+ * (que cria o papel `app`) e devolve o URL com esse papel.
+ */
+export async function startTestPostgres(): Promise<PostgresDeTeste> {
+  try {
+    const container = await new PostgreSqlContainer('postgres:17')
+      .withDatabase(baseDeDados)
+      .withUsername('postgres')
+      .withPassword(passwordSuperutilizador)
+      .withEnvironment({ APP_DB_PASSWORD: passwordApp })
+      .withCopyDirectoriesToContainer([{ source: initDir, target: '/docker-entrypoint-initdb.d' }])
+      .start();
+
+    const url = `postgresql://app:${passwordApp}@${container.getHost()}:${container.getPort()}/${baseDeDados}`;
+    return {
+      url,
+      stop: async () => {
+        await container.stop();
+      },
+    };
+  } catch (cause) {
+    throw new Error(
+      'É preciso o Docker a correr para os testes de integração (pnpm test:integracao).',
+      { cause },
+    );
+  }
+}

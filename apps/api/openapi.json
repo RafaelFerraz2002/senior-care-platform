@@ -48,7 +48,17 @@
                 }
               }
             },
-            "description": "A API está a responder."
+            "description": "A API e a base de dados estão a responder."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaudeResposta"
+                }
+              }
+            },
+            "description": "A API responde, mas a base de dados não."
           }
         },
         "summary": "Estado da API e da base de dados",

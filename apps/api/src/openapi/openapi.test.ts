@@ -10,7 +10,8 @@ describe('OpenAPI', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
-    app = await createApp();
+    // URL de substituição: o teste nunca se liga à base de dados (a pool é preguiçosa).
+    app = await createApp({ databaseUrl: 'postgresql://app:sem-ligacao@localhost:1/sem-ligacao' });
   });
 
   afterAll(async () => {
@@ -30,6 +31,11 @@ describe('OpenAPI', () => {
       operationId: 'getSaude',
       responses: {
         '200': {
+          content: {
+            'application/json': { schema: { $ref: '#/components/schemas/SaudeResposta' } },
+          },
+        },
+        '503': {
           content: {
             'application/json': { schema: { $ref: '#/components/schemas/SaudeResposta' } },
           },

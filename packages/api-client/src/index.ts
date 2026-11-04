@@ -3,4 +3,4 @@
 export { getSaudeOptions, getSaudeQueryKey, type QueryKey } from './@tanstack/react-query.gen.js';
 export { client, type CreateClientConfig } from './client.gen.js';
 export { getSaude, type Options } from './sdk.gen.js';
-export type { ClientOptions, GetSaudeData, GetSaudeResponse, GetSaudeResponses, SaudeResposta } from './types.gen.js';
+export type { ClientOptions, GetSaudeData, GetSaudeError, GetSaudeErrors, GetSaudeResponse, GetSaudeResponses, SaudeResposta } from './types.gen.js';

@@ -43,7 +43,10 @@ export function serializeOpenApiDocument(document: OpenAPIObject): string {
 
 // Corrido pelo `pnpm gerar:api-client` (a partir de dist/): escreve o apps/api/openapi.json.
 if (import.meta.main) {
-  const app = await createApp();
+  // URL de substituição: o gerador nunca se liga à base de dados (a pool é preguiçosa).
+  const app = await createApp({
+    databaseUrl: 'postgresql://app:sem-ligacao@localhost:1/sem-ligacao',
+  });
   const document = generateOpenApiDocument(app);
   await app.close();
   await writeFile(openApiPath, serializeOpenApiDocument(document));

@@ -1,6 +1,8 @@
 import { createApp } from './criar-app.js';
+import { loadConfig } from './config.js';
 
-const porta = 3000;
+const config = loadConfig(process.env);
 
-const app = await createApp();
-await app.listen(porta);
+const app = await createApp(config);
+app.enableShutdownHooks();
+await app.listen(config.apiPort);
