@@ -2,7 +2,7 @@ import { Writable } from 'node:stream';
 
 import { describe, expect, it } from 'vitest';
 
-import { createLogger } from './logger.js';
+import { createLogger, NestPinoLogger } from './logger.js';
 
 function logParaMemoria(): { linhas: string[]; destino: Writable } {
   const linhas: string[] = [];
@@ -48,5 +48,37 @@ describe('createLogger', () => {
     logger.warn('visível');
     expect(linhas.join('')).toContain('visível');
     expect(linhas.join('')).not.toContain('ignorado');
+  });
+});
+
+describe('NestPinoLogger', () => {
+  function criar() {
+    const { linhas, destino } = logParaMemoria();
+    return { linhas, nest: new NestPinoLogger(createLogger('info', destino)) };
+  }
+  const pilha = 'Error: Maria Fictícia\n    at f (/app/a.js:1:1)';
+
+  it('nunca regista a pilha como contexto num erro sem contexto', () => {
+    const { linhas, nest } = criar();
+    nest.error('falhou', pilha);
+    const saida = linhas.join('');
+    expect(saida).toContain('falhou');
+    expect(saida).not.toContain('Maria Fictícia');
+    expect(saida).not.toContain('/app/a.js');
+    expect(JSON.parse(saida).contexto).toBeUndefined();
+  });
+
+  it('regista o contexto de um erro e não a pilha', () => {
+    const { linhas, nest } = criar();
+    nest.error('falhou', pilha, 'ModuloX');
+    const saida = linhas.join('');
+    expect(JSON.parse(saida).contexto).toBe('ModuloX');
+    expect(saida).not.toContain('Maria Fictícia');
+  });
+
+  it('regista o contexto dos outros níveis', () => {
+    const { linhas, nest } = criar();
+    nest.log('arrancou', 'NestFactory');
+    expect(JSON.parse(linhas.join('')).contexto).toBe('NestFactory');
   });
 });

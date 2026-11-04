@@ -38,14 +38,20 @@ export class NestPinoLogger implements LoggerService {
     this.escrever('trace', mensagem, resto);
   }
 
-  // O Nest passa o contexto (nome do módulo) como último argumento de texto. Os restantes
-  // argumentos (pilhas de erro, objetos) não são serializados: podem arrastar dados pessoais.
+  // O Nest chama `error(mensagem, pilha, contexto)` e, nos outros níveis, `log(mensagem, contexto)`.
+  // Num `error` sem contexto só chega a pilha, por isso o contexto só se lê de `error` com 2 ou mais
+  // argumentos extra. A pilha nunca é registada (traz a mensagem do erro e caminhos): fica fora dos logs.
   private escrever(
     nivel: 'info' | 'error' | 'warn' | 'debug' | 'trace',
     mensagem: unknown,
     resto: unknown[],
   ): void {
-    const contexto = resto.findLast((valor) => typeof valor === 'string');
+    const minimo = nivel === 'error' ? 2 : 1;
+    const candidato = resto.length >= minimo ? resto.at(-1) : undefined;
+    const contexto =
+      typeof candidato === 'string' && !candidato.includes('\n') ? candidato : undefined;
+    // A mensagem é registada tal como vem: não pode levar dados pessoais. Erros da base de dados
+    // registam-se só pelo `code` (como faz o `base-de-dados`), nunca pela mensagem do driver.
     const texto =
       typeof mensagem === 'string'
         ? mensagem
