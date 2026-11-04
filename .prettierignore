@@ -7,3 +7,6 @@ pnpm-lock.yaml
 
 # Gerado pelo TanStack Router (commitado, nunca se edita à mão).
 **/routeTree.gen.ts
+
+# ADRs aceites não se reescrevem: o Prettier não lhes mexe
+docs/adr/
