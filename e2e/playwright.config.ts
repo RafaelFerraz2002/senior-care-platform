@@ -2,6 +2,8 @@ import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, devices } from '@playwright/test';
 
+import { portaGestao, portaRegisto, urlGestao, urlRegisto } from './portas.js';
+
 const raiz = fileURLToPath(new URL('..', import.meta.url));
 
 // Variáveis locais (DATABASE_URL, ...) vêm do .env da raiz; no CI vêm do ambiente.
@@ -39,20 +41,20 @@ export default defineConfig({
     },
     {
       name: 'gestao',
-      command: 'pnpm --filter @scp/gestao exec vite',
+      // --port na linha de comandos sobrepõe-se à porta do vite.config.ts.
+      command: `pnpm --filter @scp/gestao exec vite --port ${portaGestao} --strictPort`,
       cwd: raiz,
       env,
-      url: 'http://localhost:5173',
+      url: urlGestao,
       reuseExistingServer,
     },
     {
       name: 'registo',
       // O service worker só existe na build: preview em vez de dev.
-      command:
-        'pnpm --filter @scp/registo exec vite build && pnpm --filter @scp/registo exec vite preview --port 5174',
+      command: `pnpm --filter @scp/registo exec vite build && pnpm --filter @scp/registo exec vite preview --port ${portaRegisto} --strictPort`,
       cwd: raiz,
       env,
-      url: 'http://localhost:5174',
+      url: urlRegisto,
       reuseExistingServer,
       timeout: 120_000,
     },

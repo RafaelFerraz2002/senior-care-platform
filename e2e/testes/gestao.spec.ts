@@ -1,8 +1,10 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
+import { urlGestao } from '../portas.js';
+
 test('a página abre e mostra a API ligada', async ({ page }) => {
-  await page.goto('http://localhost:5173/');
+  await page.goto(`${urlGestao}/`);
   await expect(page.getByRole('heading', { name: /Gestão/ })).toBeVisible();
   await expect(page.getByText('API ligada')).toBeVisible();
 

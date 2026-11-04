@@ -1,7 +1,9 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
-const url = 'http://localhost:5174/';
+import { urlRegisto } from '../portas.js';
+
+const url = `${urlRegisto}/`;
 
 test('a página abre e mostra a API ligada', async ({ page }) => {
   await page.goto(url);
