@@ -1,0 +1,63 @@
+{
+  "components": {
+    "schemas": {
+      "SaudeResposta": {
+        "additionalProperties": false,
+        "properties": {
+          "baseDeDados": {
+            "enum": [
+              "ok",
+              "erro"
+            ],
+            "type": "string"
+          },
+          "estado": {
+            "enum": [
+              "ok",
+              "erro"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "estado",
+          "baseDeDados"
+        ],
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "contact": {},
+    "description": "",
+    "title": "Senior Care Platform API",
+    "version": "0.0.0"
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/saude": {
+      "get": {
+        "operationId": "getSaude",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaudeResposta"
+                }
+              }
+            },
+            "description": "A API está a responder."
+          }
+        },
+        "summary": "Estado da API e da base de dados",
+        "tags": [
+          "Saude"
+        ]
+      }
+    }
+  },
+  "servers": [],
+  "tags": []
+}

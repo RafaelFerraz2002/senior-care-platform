@@ -1,0 +1,9 @@
+{
+  "extends": "@scp/config/tsconfig.base.json",
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "types": ["node"]
+  },
+  "include": ["src", "vitest.config.ts"]
+}

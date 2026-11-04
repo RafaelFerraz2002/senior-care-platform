@@ -7,3 +7,5 @@ allowBuilds:
   lefthook: true
   '@swc/core': true
   esbuild: true
+  # Telemetria do swagger-ui-dist (dependência do @nestjs/swagger): não corre.
+  '@scarf/scarf': false

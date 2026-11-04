@@ -18,6 +18,8 @@ export default [
       '.claude/**',
       'playwright-report/**',
       'test-results/**',
+      // Gerado pela hey-api (pnpm gerar:api-client): nunca se edita à mão.
+      'packages/api-client/src/**',
     ],
   },
   ...base,

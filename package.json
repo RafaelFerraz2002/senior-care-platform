@@ -15,7 +15,7 @@
     "test:integracao": "turbo run test:integracao",
     "test:e2e": "turbo run test:e2e",
     "test:tudo": "turbo run test test:integracao test:e2e",
-    "gerar:api-client": "echo 'gerar:api-client: preenchido na Tarefa 2'",
+    "gerar:api-client": "turbo run build --filter=@scp/api && pnpm --filter @scp/api gerar:openapi && pnpm --filter @scp/api-client gerar",
     "verificar:tamanho": "echo 'verificar:tamanho: preenchido na Tarefa 9'",
     "prepare": "lefthook install"
   },
