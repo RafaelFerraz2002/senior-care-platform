@@ -16,7 +16,7 @@
     "test:e2e": "turbo run test:e2e",
     "test:tudo": "turbo run test test:integracao test:e2e",
     "gerar:api-client": "turbo run build --filter=@scp/api && pnpm --filter @scp/api gerar:openapi && pnpm --filter @scp/api-client gerar",
-    "verificar:tamanho": "echo 'verificar:tamanho: preenchido na Tarefa 9'",
+    "verificar:tamanho": "node scripts/verificar-tamanho.mjs",
     "prepare": "lefthook install"
   },
   "devDependencies": {

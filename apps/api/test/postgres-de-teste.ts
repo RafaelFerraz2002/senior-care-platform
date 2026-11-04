@@ -7,6 +7,8 @@ const initDir = fileURLToPath(new URL('../../../docker/postgres/init', import.me
 const baseDeDados = 'scp_teste';
 const passwordSuperutilizador = 'superutilizador-de-teste';
 const passwordApp = 'app-de-teste';
+// Mensagem do Testcontainers quando não encontra nenhum Docker a correr.
+const semRuntime = 'Could not find a working container runtime strategy';
 
 export interface PostgresDeTeste {
   /** URL de ligação com o papel `app` (não o superutilizador). */
@@ -56,9 +58,13 @@ export async function startTestPostgres(): Promise<PostgresDeTeste> {
       },
     };
   } catch (cause) {
-    throw new Error(
-      'É preciso o Docker a correr para os testes de integração (pnpm test:integracao).',
-      { cause },
-    );
+    // Só o "Docker indisponível" ganha a mensagem em português; qualquer outro erro passa com a sua.
+    if (cause instanceof Error && cause.message.includes(semRuntime)) {
+      throw new Error(
+        'É preciso o Docker a correr para os testes de integração (pnpm test:integracao).',
+        { cause },
+      );
+    }
+    throw cause;
   }
 }
