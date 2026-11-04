@@ -30,4 +30,20 @@ describe('loadConfig', () => {
       sentryDsn: 'https://exemplo.invalid/1',
     });
   });
+
+  it('usa a porta 3000 quando API_PORT está vazia', () => {
+    const config = loadConfig({
+      DATABASE_URL: 'postgresql://app:x@localhost:5440/scp',
+      API_PORT: '',
+    });
+    expect(config.apiPort).toBe(3000);
+  });
+
+  it('recusa uma API_PORT inválida', () => {
+    for (const valor of ['abc', '0', '70000', '30.5', '-1']) {
+      expect(() =>
+        loadConfig({ DATABASE_URL: 'postgresql://app:x@localhost:5440/scp', API_PORT: valor }),
+      ).toThrowError(`API_PORT inválida: ${valor}`);
+    }
+  });
 });
