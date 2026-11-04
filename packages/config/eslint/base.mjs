@@ -1,6 +1,12 @@
+import { fileURLToPath, URL } from 'node:url';
+
 import js from '@eslint/js';
 import boundaries from 'eslint-plugin-boundaries';
 import tseslint from 'typescript-eslint';
+
+// Raiz do repositório: os padrões dos elementos são relativos a ela, e não ao cwd. Sem isto, o
+// `eslint .` corrido dentro de um pacote (turbo run lint) não reconhece nenhum elemento e não avisa.
+const raizDoRepositorio = fileURLToPath(new URL('../../..', import.meta.url));
 
 const tiposSemBaseDeDados = ['app-api', 'app-web', 'pacote', 'api-modulo'];
 
@@ -12,6 +18,7 @@ export default [
     files: ['**/*.{ts,tsx,mjs}'],
     plugins: { boundaries },
     settings: {
+      'boundaries/root-path': raizDoRepositorio,
       'import/resolver': {
         typescript: { alwaysTryTypes: true },
       },
@@ -58,6 +65,13 @@ export default [
                 to: { element: { type: 'api-modulo' }, file: { path: '!**/index.ts' } },
               },
               message: 'Um módulo da API só pode ser importado pelo seu index.ts.',
+            },
+            // A camada da base de dados também só se importa pelo seu index.ts.
+            {
+              disallow: {
+                to: { element: { type: 'api-base-de-dados' }, file: { path: '!**/index.ts' } },
+              },
+              message: 'A camada da base de dados só pode ser importada pelo seu index.ts.',
             },
             // Só a camada da base de dados importa o pg.
             {
