@@ -34,6 +34,9 @@ export class NestPinoLogger implements LoggerService {
   debug(mensagem: unknown, ...resto: unknown[]): void {
     this.escrever('debug', mensagem, resto);
   }
+  fatal(mensagem: unknown, ...resto: unknown[]): void {
+    this.escrever('fatal', mensagem, resto);
+  }
   verbose(mensagem: unknown, ...resto: unknown[]): void {
     this.escrever('trace', mensagem, resto);
   }
@@ -42,7 +45,7 @@ export class NestPinoLogger implements LoggerService {
   // Num `error` sem contexto só chega a pilha, por isso o contexto só se lê de `error` com 2 ou mais
   // argumentos extra. A pilha nunca é registada (traz a mensagem do erro e caminhos): fica fora dos logs.
   private escrever(
-    nivel: 'info' | 'error' | 'warn' | 'debug' | 'trace',
+    nivel: 'info' | 'error' | 'warn' | 'debug' | 'trace' | 'fatal',
     mensagem: unknown,
     resto: unknown[],
   ): void {

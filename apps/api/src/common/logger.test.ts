@@ -81,4 +81,13 @@ describe('NestPinoLogger', () => {
     nest.log('arrancou', 'NestFactory');
     expect(JSON.parse(linhas.join('')).contexto).toBe('NestFactory');
   });
+
+  it('regista os erros fatais', () => {
+    const { linhas, nest } = criar();
+    nest.fatal('caiu', 'NestFactory');
+    const linha = JSON.parse(linhas.join(''));
+    expect(linha.level).toBe(60);
+    expect(linha.msg).toBe('caiu');
+    expect(linha.contexto).toBe('NestFactory');
+  });
 });
