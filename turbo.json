@@ -1,11 +1,30 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "tasks": {
-    "dev": { "persistent": true, "cache": false },
-    "build": { "dependsOn": ["^build"], "outputs": ["dist/**"] },
-    "typecheck": { "dependsOn": ["^build"] },
-    "test": { "dependsOn": ["^build"], "outputs": ["coverage/**"] },
-    "test:integracao": { "dependsOn": ["^build"], "cache": false },
-    "test:e2e": { "dependsOn": ["^build"], "cache": false }
+    "dev": {
+      "dependsOn": ["^build"],
+      "persistent": true,
+      "cache": false,
+      "passThroughEnv": ["API_PORT", "DATABASE_URL", "LOG_LEVEL", "SENTRY_DSN", "VITE_SENTRY_DSN"]
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"]
+    },
+    "test:integracao": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "test:e2e": {
+      "dependsOn": ["^build"],
+      "cache": false
+    }
   }
 }
