@@ -20,11 +20,29 @@
     },
     "test:integracao": {
       "dependsOn": ["^build"],
-      "cache": false
+      "cache": false,
+      "passThroughEnv": [
+        "API_PORT",
+        "DATABASE_URL",
+        "DOCKER_*",
+        "E2E_API_PORT",
+        "LOG_LEVEL",
+        "PLAYWRIGHT_*",
+        "TESTCONTAINERS_*"
+      ]
     },
     "test:e2e": {
       "dependsOn": ["^build"],
-      "cache": false
+      "cache": false,
+      "passThroughEnv": [
+        "API_PORT",
+        "DATABASE_URL",
+        "DOCKER_*",
+        "E2E_API_PORT",
+        "LOG_LEVEL",
+        "PLAYWRIGHT_*",
+        "TESTCONTAINERS_*"
+      ]
     }
   }
 }
