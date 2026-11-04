@@ -1,7 +1,6 @@
 import type { INestApplication } from '@nestjs/common';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { BaseDeDadosService } from '../src/base-de-dados/index.js';
 import { createApp } from '../src/criar-app.js';
 import { type PostgresDeTeste, startTestPostgres } from './postgres-de-teste.js';
 
@@ -33,13 +32,24 @@ describe('GET /saude (com Postgres real)', () => {
   });
 
   it('liga-se com o papel app, que não é superutilizador', async () => {
-    const linhas = await app
-      .get(BaseDeDadosService)
-      .consultar<{ current_user: string; rolsuper: boolean; rolbypassrls: boolean }>(
-        'SELECT current_user, rolsuper, rolbypassrls FROM pg_roles WHERE rolname = current_user',
-      );
+    // O pedido ao /saude obriga a pool real da API a ligar-se.
+    await fetch(`${baseUrl}/saude`);
 
-    expect(linhas).toEqual([{ current_user: 'app', rolsuper: false, rolbypassrls: false }]);
+    const linhas = await postgres.consultarComoSuperutilizador(
+      `SELECT a.usename, r.rolsuper, r.rolbypassrls
+         FROM pg_stat_activity a JOIN pg_roles r ON r.rolname = a.usename
+        WHERE a.datname = 'scp_teste' AND a.backend_type = 'client backend'
+          AND a.pid <> pg_backend_pid()
+        GROUP BY 1, 2, 3`,
+    );
+    const todas = await postgres.consultarComoSuperutilizador(
+      `SELECT DISTINCT usename FROM pg_stat_activity
+        WHERE datname = 'scp_teste' AND backend_type = 'client backend'
+          AND pid <> pg_backend_pid()`,
+    );
+
+    expect(linhas).toEqual(['app|f|f']);
+    expect(todas).toEqual(['app']);
   });
 
   it('não abre CORS a origens estranhas', async () => {

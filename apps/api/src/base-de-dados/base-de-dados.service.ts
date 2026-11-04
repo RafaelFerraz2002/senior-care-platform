@@ -37,11 +37,6 @@ export class BaseDeDadosService implements OnModuleDestroy {
     }
   }
 
-  async consultar<T extends object>(sql: string, valores: unknown[] = []): Promise<T[]> {
-    const resultado = await this.pool.query<T & pg.QueryResultRow>(sql, valores);
-    return resultado.rows;
-  }
-
   async onModuleDestroy(): Promise<void> {
     await this.pool.end();
   }

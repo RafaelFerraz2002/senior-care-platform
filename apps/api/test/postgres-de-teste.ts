@@ -11,6 +11,11 @@ const passwordApp = 'app-de-teste';
 export interface PostgresDeTeste {
   /** URL de ligação com o papel `app` (não o superutilizador). */
   url: string;
+  /**
+   * Corre SQL como superutilizador dentro do contentor (psql), para o teste inspecionar a base de dados
+   * sem a API ter de expor uma via de SQL arbitrário. Devolve as linhas, com colunas separadas por `|`.
+   */
+  consultarComoSuperutilizador(sql: string): Promise<string[]>;
   stop(): Promise<void>;
 }
 
@@ -31,6 +36,21 @@ export async function startTestPostgres(): Promise<PostgresDeTeste> {
     const url = `postgresql://app:${passwordApp}@${container.getHost()}:${container.getPort()}/${baseDeDados}`;
     return {
       url,
+      consultarComoSuperutilizador: async (sql) => {
+        const { output, exitCode } = await container.exec([
+          'psql',
+          '-U',
+          'postgres',
+          '-d',
+          baseDeDados,
+          '-Atc',
+          sql,
+        ]);
+        if (exitCode !== 0) {
+          throw new Error(`psql falhou (${exitCode}): ${output}`);
+        }
+        return output.split('\n').filter((linha) => linha !== '');
+      },
       stop: async () => {
         await container.stop();
       },
