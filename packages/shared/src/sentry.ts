@@ -10,7 +10,9 @@ interface FrameLike {
 /** O mínimo da forma de um evento do Sentry de que o filtro precisa (compatível com os tipos do SDK). */
 export interface SentryEventLike {
   user?: unknown;
+  extra?: unknown;
   request?: {
+    url?: string;
     cookies?: unknown;
     headers?: unknown;
     data?: unknown;
@@ -30,15 +32,24 @@ export const opcoesSentrySemPii = {
   maxBreadcrumbs: 0,
 } as const;
 
+/** O SDK do browser preenche o URL com `location.href`, que traz query e fragmento: fica só origem e caminho. */
+function cortarUrl(request: { url?: string }): void {
+  if (typeof request.url === 'string') {
+    request.url = request.url.split(/[?#]/)[0] ?? '';
+  }
+}
+
 /** Remove o que o ADR-006 proíbe: utilizador, IP, cookies, headers, corpo, geolocalização e variáveis locais. */
 export function scrubSentryEvent<T extends SentryEventLike>(event: T): T {
   delete event.user;
+  delete event.extra;
   if (event.request) {
     delete event.request.cookies;
     delete event.request.headers;
     delete event.request.data;
     delete event.request.env;
     delete event.request.query_string;
+    cortarUrl(event.request);
   }
   if (event.contexts) {
     delete (event.contexts as { geo?: unknown }).geo;

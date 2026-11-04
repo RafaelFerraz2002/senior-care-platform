@@ -31,6 +31,35 @@ function criarEvento() {
 }
 
 describe('scrubSentryEvent', () => {
+  it('reduz o URL do pedido à origem e ao caminho', () => {
+    const evento = criarEvento();
+    evento.request.url =
+      'https://gestao.exemplo.invalid/utentes?nome=Maria%20Fict%C3%ADcia#nota=privada';
+    const texto = JSON.stringify(scrubSentryEvent(evento));
+    expect(evento.request.url).toBe('https://gestao.exemplo.invalid/utentes');
+    expect(texto).not.toContain('Maria');
+    expect(texto).not.toContain('privada');
+  });
+
+  it('corta a query e o fragmento de URLs relativos ou inválidos', () => {
+    for (const [entrada, esperado] of [
+      ['/utentes?nome=Maria#nota=x', '/utentes'],
+      ['/utentes#nota=x', '/utentes'],
+      ['nao é um url?segredo=1', 'nao é um url'],
+    ] as const) {
+      const evento = criarEvento();
+      evento.request.url = entrada;
+      expect(scrubSentryEvent(evento).request.url).toBe(esperado);
+    }
+  });
+
+  it('apaga os dados extra', () => {
+    const evento = { ...criarEvento(), extra: { nome: 'Maria Fictícia' } };
+    const limpo = scrubSentryEvent(evento);
+    expect(limpo.extra).toBeUndefined();
+    expect(JSON.stringify(limpo)).not.toContain('Maria Fictícia');
+  });
+
   it('remove utilizador, IP, cookies, headers, corpo e variáveis locais', () => {
     const limpo = scrubSentryEvent(criarEvento());
     const texto = JSON.stringify(limpo);
