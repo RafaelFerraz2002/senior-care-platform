@@ -20,6 +20,8 @@ export default [
       'test-results/**',
       // Gerado pela hey-api (pnpm gerar:api-client): nunca se edita à mão.
       'packages/api-client/src/**',
+      // Gerado pelo plugin do TanStack Router (commitado para o typecheck funcionar sem correr o Vite).
+      '**/routeTree.gen.ts',
     ],
   },
   ...base,

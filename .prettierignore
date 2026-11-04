@@ -4,3 +4,6 @@ packages/api-client/src/
 
 # Escrito pelo pnpm.
 pnpm-lock.yaml
+
+# Gerado pelo TanStack Router (commitado, nunca se edita à mão).
+**/routeTree.gen.ts
