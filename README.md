@@ -48,7 +48,7 @@ O `pnpm dev` sobe os serviços (`docker compose up -d --wait`), a API e as duas 
 | Registo Diário | http://localhost:5174       |
 | API (estado)   | http://localhost:3000/saude |
 
-As portas dos serviços no anfitrião (PostgreSQL 5440, MinIO 9010 e 9011, Mailpit 1035 e 8035) e a da API (`API_PORT`) mudam-se no `.env`, se estiverem ocupadas. Se mudar a `API_PORT`, o endereço de estado da API muda com ela.
+As portas dos serviços no anfitrião (PostgreSQL 5440, MinIO 9010 e 9011, Mailpit 1035 e 8035) e a da API (`API_PORT`) mudam-se no `.env`, se estiverem ocupadas. Se mudar a `API_PORT`, o endereço de estado da API muda com ela. Se mudar a `POSTGRES_PORT`, mude também a porta no `DATABASE_URL`: a API não a lê da `POSTGRES_PORT`.
 
 Os serviços do `docker compose` **ficam a correr** quando se pára o `pnpm dev`. Para os parar: `docker compose down`.
 
@@ -63,8 +63,8 @@ Os serviços do `docker compose` **ficam a correr** quando se pára o `pnpm dev`
 | `pnpm typecheck`         | Verificação de tipos.                                                                     |
 | `pnpm test`              | Testes unitários e de componentes. Rápido e sem Docker.                                   |
 | `pnpm test:integracao`   | Testes de integração com Postgres real (precisa de Docker).                               |
-| `pnpm test:e2e`          | Testes ponta a ponta com Playwright (precisa de Docker e dos browsers, ver abaixo).       |
-| `pnpm test:tudo`         | Unitários, componentes, integração e ponta a ponta.                                       |
+| `pnpm test:e2e`          | Testes ponta a ponta com Playwright (precisa dos serviços e dos browsers, ver abaixo).    |
+| `pnpm test:tudo`         | Unitários, componentes, integração e ponta a ponta (precisa dos serviços, ver abaixo).    |
 | `pnpm gerar:api-client`  | Regenera o `openapi.json` e o cliente da API depois de mudar a API.                       |
 | `pnpm verificar:tamanho` | Mede o JavaScript de cada app e compara com `tamanho-apps.json` (depois de `pnpm build`). |
 
@@ -73,6 +73,10 @@ Os browsers do Playwright instalam-se uma vez:
 ```sh
 pnpm --filter @scp/e2e exec playwright install chromium webkit
 ```
+
+O `pnpm test:e2e` e o `pnpm test:tudo` precisam dos serviços em pé: corra `docker compose up -d` antes (o `pnpm dev` também os sobe). Sem eles, o `/saude` da API dos testes responde 503 e o Playwright falha ao fim de 120 s com "Timed out waiting for webServer".
+
+Os testes ponta a ponta usam portas próprias, para não apanharem um `pnpm dev` a correr: API 3100 (muda-se com `E2E_API_PORT`), Gestão 4173 e Registo Diário 4174.
 
 ## Estado do projeto
 
