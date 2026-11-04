@@ -37,6 +37,16 @@ if (!existsSync(ficheiroReferencia)) {
   process.exit(1);
 }
 const referencia = JSON.parse(readFileSync(ficheiroReferencia, 'utf8'));
+// Sem isto, uma app em falta dava NaN e a comparação passava sempre em silêncio.
+const semReferencia = apps.filter(
+  (app) => typeof referencia[app] !== 'number' || !Number.isFinite(referencia[app]),
+);
+if (semReferencia.length > 0) {
+  console.error(
+    `tamanho-apps.json não tem um valor de referência numérico para: ${semReferencia.join(', ')}.`,
+  );
+  process.exit(1);
+}
 
 let falhou = false;
 for (const app of apps) {
