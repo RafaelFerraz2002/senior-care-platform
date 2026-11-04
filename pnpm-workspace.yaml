@@ -1,0 +1,9 @@
+packages:
+  - apps/*
+  - packages/*
+  - e2e
+
+allowBuilds:
+  lefthook: true
+  '@swc/core': true
+  esbuild: true
