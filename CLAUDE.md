@@ -33,13 +33,15 @@ Plataforma SaaS multi-organização para gestão de respostas sociais para idoso
 - **Língua:** documentação, issues, PRs e mensagens ao utilizador em **português de Portugal**. Docs em português, incluindo o README.
 - **Nomes no código: o negócio em português (sem acentos), a técnica em inglês.** Na dúvida: se a palavra aparece nos requisitos do Notion ou na interface, é negócio e fica em português.
 
-  | O quê                                            | Língua                                                     | Exemplo                                                           |
-  | ------------------------------------------------ | ---------------------------------------------------------- | ----------------------------------------------------------------- |
-  | Tabelas, colunas, entidades e módulos do domínio | Português; `snake_case` na base, `camelCase` no TypeScript | `utentes`, `registos_diarios`, `organizacao_id` / `organizacaoId` |
-  | Rotas da API e das apps                          | Português, `kebab-case`                                    | `GET /utentes/:id`, `/registo-diario`                             |
-  | Nomes dos testes e mensagens ao utilizador       | Português, frases                                          | `it('recusa ver utentes de outra organização')`                   |
-  | Verbos, padrões e sufixos técnicos               | Inglês                                                     | `UtentesService.findById()`, `useUtentes()`, `*.controller.ts`    |
-  | Pastas técnicas e ficheiros de configuração      | Inglês                                                     | `apps/api/src/common/`, `vitest.config.ts`                        |
+  | O quê                                            | Língua                                                                  | Exemplo                                                                             |
+  | ------------------------------------------------ | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+  | Tabelas, colunas, entidades e módulos do domínio | Português, sem acentos; `snake_case` na base, `camelCase` no TypeScript | `utentes`, `registos_diarios`, `organizacao_id` / `organizacaoId`, `dataNascimento` |
+  | Rotas da API e das apps                          | Português, `kebab-case`                                                 | `GET /utentes/:id`, `/registo-diario`                                               |
+  | Nomes dos testes e mensagens ao utilizador       | Português, frases                                                       | `it('recusa ver utentes de outra organização')`                                     |
+  | Verbos, padrões e sufixos técnicos               | Inglês                                                                  | `UtentesService.findById()`, `createRegisto()`, `useUtentes()`, `*.controller.ts`   |
+  | Pastas técnicas e ficheiros de configuração      | Inglês                                                                  | `apps/api/src/common/`, `vitest.config.ts`                                          |
+
+  Variáveis e funções locais seguem a mesma regra: o nome de negócio em português e o verbo técnico em inglês (`initSentry`, `loadConfig`, `urlRegisto`).
 
   Os exemplos dos ADRs com `organization_id` são ilustrativos: no código é `organizacao_id`.
 
@@ -49,6 +51,6 @@ Plataforma SaaS multi-organização para gestão de respostas sociais para idoso
 
 - `pnpm install`; `pnpm dev` (sobe o `docker compose`, a API e as apps; os serviços ficam a correr).
 - `pnpm lint`, `pnpm typecheck`, `pnpm test` (unitários e componentes, sem Docker).
-- `pnpm test:integracao` (Docker); `pnpm test:e2e` (Docker e browsers do Playwright); `pnpm test:tudo` (todos).
+- `pnpm test:integracao` (Docker); `pnpm test:e2e` (`docker compose up -d` antes e browsers do Playwright); `pnpm test:tudo` (todos).
 - `pnpm gerar:api-client`: regenera o `openapi.json` e o cliente depois de mudar a API.
 - `pnpm verificar:tamanho` (depois de `pnpm build`): compara o JavaScript das apps com `tamanho-apps.json`.
