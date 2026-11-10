@@ -2,6 +2,7 @@ import { fileURLToPath, URL } from 'node:url';
 
 import js from '@eslint/js';
 import boundaries from 'eslint-plugin-boundaries';
+import checkFile from 'eslint-plugin-check-file';
 import tseslint from 'typescript-eslint';
 
 // Raiz do repositório: os padrões dos elementos são relativos a ela, e não ao cwd. Sem isto, o
@@ -10,7 +11,11 @@ const repoRoot = fileURLToPath(new URL('../../..', import.meta.url));
 
 const typesWithoutDatabase = ['app-api', 'app-web', 'package', 'api-module'];
 
-/** Configuração base partilhada: typescript-eslint, complexidade e fronteiras entre módulos. */
+/**
+ * Configuração base partilhada: typescript-eslint, complexidade, fronteiras entre módulos e o formato
+ * dos nomes (ficheiros e pastas em kebab-case; identificadores em camelCase, PascalCase ou UPPER_CASE).
+ * A língua dos nomes (negócio em português, técnica em inglês) não se verifica aqui: fica para a revisão.
+ */
 export default [
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -81,6 +86,41 @@ export default [
             },
           ],
         },
+      ],
+    },
+  },
+  {
+    files: ['**/*.{ts,tsx,mjs}'],
+    // `__root.tsx` é o nome que o TanStack Router impõe.
+    ignores: ['**/__root.tsx'],
+    plugins: { 'check-file': checkFile },
+    rules: {
+      'check-file/filename-naming-convention': [
+        'error',
+        { '**/*.{ts,tsx,mjs}': 'KEBAB_CASE' },
+        // `.test`, `.config`, `.d`, `.spec`… não contam para o formato.
+        { ignoreMiddleExtensions: true },
+      ],
+      'check-file/folder-naming-convention': ['error', { '**/': 'KEBAB_CASE' }],
+    },
+  },
+  {
+    files: ['**/*.{ts,tsx,mjs}'],
+    rules: {
+      '@typescript-eslint/naming-convention': [
+        'error',
+        { selector: 'default', format: ['camelCase'] },
+        { selector: 'variable', format: ['camelCase', 'PascalCase', 'UPPER_CASE'] },
+        { selector: 'function', format: ['camelCase', 'PascalCase'] },
+        { selector: 'parameter', format: ['camelCase'], leadingUnderscore: 'allow' },
+        { selector: 'typeLike', format: ['PascalCase'] },
+        { selector: 'enumMember', format: ['PascalCase', 'UPPER_CASE'] },
+        // Chaves de objetos e de tipos podem vir de fora (headers, 'Content-Type', campos do Sentry).
+        {
+          selector: ['objectLiteralProperty', 'typeProperty', 'objectLiteralMethod'],
+          format: null,
+        },
+        { selector: 'import', format: null },
       ],
     },
   },
