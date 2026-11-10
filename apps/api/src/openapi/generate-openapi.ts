@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import type { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, type OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
 
-import { createApp } from '../criar-app.js';
+import { createApp } from '../create-app.js';
 
 /** O openapi.json versionado, na raiz de apps/api (o mesmo caminho a partir de src/ e de dist/). */
 export const openApiPath = fileURLToPath(new URL('../../openapi.json', import.meta.url));
@@ -41,7 +41,7 @@ export function serializeOpenApiDocument(document: OpenAPIObject): string {
   return `${JSON.stringify(sortKeys(document), null, 2)}\n`;
 }
 
-// Corrido pelo `pnpm gerar:api-client` (a partir de dist/): escreve o apps/api/openapi.json.
+// Corrido pelo `pnpm generate:api-client` (a partir de dist/): escreve o apps/api/openapi.json.
 if (import.meta.main) {
   // URL de substituição: o gerador nunca se liga à base de dados (a pool é preguiçosa).
   const app = await createApp({

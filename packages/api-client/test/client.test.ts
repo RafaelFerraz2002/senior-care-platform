@@ -5,7 +5,7 @@ import { client, getSaude, getSaudeOptions } from '../src/index.js';
 describe('cliente gerado', () => {
   it('chama GET /saude no baseUrl definido pela app', async () => {
     const fetchFalso = vi.fn<typeof fetch>(async () =>
-      Response.json({ estado: 'ok', baseDeDados: 'ok' }),
+      Response.json({ status: 'ok', database: 'ok' }),
     );
     // No browser as apps usam '/api'; no Node o Request precisa de um URL absoluto.
     client.setConfig({ baseUrl: 'http://localhost:5173/api', fetch: fetchFalso });
@@ -13,7 +13,7 @@ describe('cliente gerado', () => {
     const { data, error } = await getSaude();
 
     expect(error).toBeUndefined();
-    expect(data).toEqual({ estado: 'ok', baseDeDados: 'ok' });
+    expect(data).toEqual({ status: 'ok', database: 'ok' });
     const pedido = fetchFalso.mock.calls[0]?.[0];
     expect(pedido instanceof Request ? pedido.url : pedido).toBe('http://localhost:5173/api/saude');
   });

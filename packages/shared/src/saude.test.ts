@@ -1,15 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { saudeRespostaSchema } from './index.js';
+import { saudeResponseSchema } from './index.js';
 
-describe('saudeRespostaSchema', () => {
-  it('aceita { estado: "ok", baseDeDados: "ok" } e rejeita estados desconhecidos', () => {
-    expect(saudeRespostaSchema.parse({ estado: 'ok', baseDeDados: 'ok' })).toEqual({
-      estado: 'ok',
-      baseDeDados: 'ok',
+describe('saudeResponseSchema', () => {
+  it('aceita { status: "ok", database: "ok" } e rejeita estados desconhecidos', () => {
+    expect(saudeResponseSchema.parse({ status: 'ok', database: 'ok' })).toEqual({
+      status: 'ok',
+      database: 'ok',
     });
-    expect(saudeRespostaSchema.safeParse({ estado: 'talvez', baseDeDados: 'ok' }).success).toBe(
-      false,
-    );
+    expect(saudeResponseSchema.safeParse({ status: 'talvez', database: 'ok' }).success).toBe(false);
   });
 });

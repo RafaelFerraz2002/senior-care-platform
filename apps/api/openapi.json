@@ -1,27 +1,27 @@
 {
   "components": {
     "schemas": {
-      "SaudeResposta": {
+      "SaudeResponse": {
         "additionalProperties": false,
         "properties": {
-          "baseDeDados": {
+          "database": {
             "enum": [
               "ok",
-              "erro"
+              "error"
             ],
             "type": "string"
           },
-          "estado": {
+          "status": {
             "enum": [
               "ok",
-              "erro"
+              "error"
             ],
             "type": "string"
           }
         },
         "required": [
-          "estado",
-          "baseDeDados"
+          "status",
+          "database"
         ],
         "type": "object"
       }
@@ -44,7 +44,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SaudeResposta"
+                  "$ref": "#/components/schemas/SaudeResponse"
                 }
               }
             },
@@ -54,7 +54,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SaudeResposta"
+                  "$ref": "#/components/schemas/SaudeResponse"
                 }
               }
             },

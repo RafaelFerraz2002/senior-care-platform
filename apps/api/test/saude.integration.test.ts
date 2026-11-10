@@ -1,11 +1,11 @@
 import type { INestApplication } from '@nestjs/common';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { createApp } from '../src/criar-app.js';
-import { type PostgresDeTeste, startTestPostgres } from './postgres-de-teste.js';
+import { createApp } from '../src/create-app.js';
+import { type TestPostgres, startTestPostgres } from './test-postgres.js';
 
 describe('GET /saude (com Postgres real)', () => {
-  let postgres: PostgresDeTeste;
+  let postgres: TestPostgres;
   let app: INestApplication;
   let baseUrl: string;
   let postgresParado = false;
@@ -28,7 +28,7 @@ describe('GET /saude (com Postgres real)', () => {
     const resposta = await fetch(`${baseUrl}/saude`);
 
     expect(resposta.status).toBe(200);
-    expect(await resposta.json()).toEqual({ estado: 'ok', baseDeDados: 'ok' });
+    expect(await resposta.json()).toEqual({ status: 'ok', database: 'ok' });
   });
 
   it('liga-se com o papel app, que não é superutilizador', async () => {
@@ -67,7 +67,7 @@ describe('GET /saude (com Postgres real)', () => {
 
     const resposta = await fetch(`${baseUrl}/saude`);
     expect(resposta.status).toBe(503);
-    expect(await resposta.json()).toEqual({ estado: 'erro', baseDeDados: 'erro' });
+    expect(await resposta.json()).toEqual({ status: 'error', database: 'error' });
 
     // A API continua viva: responde a um segundo pedido (um erro não tratado da pool deitava o processo abaixo).
     const outra = await fetch(`${baseUrl}/saude`);

@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
-import { urlRegisto } from '../portas.js';
+import { urlRegisto } from '../ports.js';
 
 const url = `${urlRegisto}/`;
 

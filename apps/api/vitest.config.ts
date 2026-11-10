@@ -6,8 +6,8 @@ export default defineConfig({
   // o plugin desliga o Oxc do Vite, que a perderia.
   plugins: [swc.vite({ module: { type: 'es6' } })],
   test: {
-    // Só os testes unitários: os de integração (*.integracao.test.ts) têm um script próprio.
+    // Só os testes unitários: os de integração (*.integration.test.ts) têm um script próprio.
     include: ['src/**/*.test.ts'],
-    exclude: [...configDefaults.exclude, 'src/**/*.integracao.test.ts'],
+    exclude: [...configDefaults.exclude, 'src/**/*.integration.test.ts'],
   },
 });

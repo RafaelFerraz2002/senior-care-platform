@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger, type OnModuleDestroy } from '@nestjs/common';
 import pg from 'pg';
 
-export const BASE_DE_DADOS_URL = Symbol('BASE_DE_DADOS_URL');
+export const DATABASE_URL_TOKEN = Symbol('DATABASE_URL_TOKEN');
 
 const TIMEOUT_MS = 2000;
 
@@ -10,11 +10,11 @@ const TIMEOUT_MS = 2000;
  * A pool é preguiçosa: não abre ligações até haver a primeira consulta.
  */
 @Injectable()
-export class BaseDeDadosService implements OnModuleDestroy {
-  private readonly logger = new Logger(BaseDeDadosService.name);
+export class DatabaseService implements OnModuleDestroy {
+  private readonly logger = new Logger(DatabaseService.name);
   private readonly pool: pg.Pool;
 
-  constructor(@Inject(BASE_DE_DADOS_URL) databaseUrl: string) {
+  constructor(@Inject(DATABASE_URL_TOKEN) databaseUrl: string) {
     this.pool = new pg.Pool({
       connectionString: databaseUrl,
       connectionTimeoutMillis: TIMEOUT_MS,
@@ -28,7 +28,7 @@ export class BaseDeDadosService implements OnModuleDestroy {
   }
 
   /** `SELECT 1` com timeout de 2 s. Devolve `false` em vez de lançar erro. */
-  async verificarLigacao(): Promise<boolean> {
+  async checkConnection(): Promise<boolean> {
     try {
       await this.pool.query('SELECT 1');
       return true;

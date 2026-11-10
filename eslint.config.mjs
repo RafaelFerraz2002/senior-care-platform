@@ -18,7 +18,7 @@ export default [
       '.claude/**',
       'playwright-report/**',
       'test-results/**',
-      // Gerado pela hey-api (pnpm gerar:api-client): nunca se edita à mão.
+      // Gerado pela hey-api (pnpm generate:api-client): nunca se edita à mão.
       'packages/api-client/src/**',
       // Gerado pelo plugin do TanStack Router (commitado para o typecheck funcionar sem correr o Vite).
       '**/routeTree.gen.ts',

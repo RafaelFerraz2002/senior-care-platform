@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
-import { urlGestao } from '../portas.js';
+import { urlGestao } from '../ports.js';
 
 test('a página abre e mostra a API ligada', async ({ page }) => {
   await page.goto(`${urlGestao}/`);

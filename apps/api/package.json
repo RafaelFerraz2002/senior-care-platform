@@ -10,8 +10,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
-    "gerar:openapi": "node dist/openapi/gerar-openapi.js",
-    "test:integracao": "vitest run --config vitest.integracao.config.ts"
+    "generate:openapi": "node dist/openapi/generate-openapi.js",
+    "test:integration": "vitest run --config vitest.integration.config.ts"
   },
   "dependencies": {
     "@nestjs/common": "12.3.2",

@@ -509,7 +509,7 @@ importers:
         specifier: 8.72.1
         version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
 
-  packages/dados-ficticios:
+  packages/fake-data:
     dependencies:
       '@faker-js/faker':
         specifier: 10.6.0

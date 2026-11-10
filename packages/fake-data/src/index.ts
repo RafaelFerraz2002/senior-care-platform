@@ -1,18 +1,18 @@
 import { Faker, pt_PT } from '@faker-js/faker';
 
-export interface Gerador {
+export interface FakeDataGenerator {
   nomePessoa(): string;
   dataNascimento(): Date;
 }
 
 /**
- * Gerador de dados fictícios (nunca reais) para seeds, testes e demonstrações.
+ * FakeDataGenerator de dados fictícios (nunca reais) para seeds, testes e demonstrações.
  * Cada gerador tem a sua própria instância do faker: a mesma semente dá sempre os mesmos dados.
  */
 /** Data de referência fixa, para as datas geradas dependerem só da semente e não do relógio. */
 const dataDeReferencia = new Date('2026-01-01T00:00:00Z');
 
-export function createGerador(semente: number): Gerador {
+export function createFakeDataGenerator(semente: number): FakeDataGenerator {
   const faker = new Faker({ locale: [pt_PT] });
   faker.seed(semente);
   return {

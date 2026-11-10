@@ -16,7 +16,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icone-192.png', 'icone-512.png'],
+      includeAssets: ['icon-192.png', 'icon-512.png'],
       manifest: {
         name: 'Registo Diário',
         short_name: 'Registo',
@@ -26,8 +26,8 @@ export default defineConfig({
         theme_color: '#0f766e',
         background_color: '#ffffff',
         icons: [
-          { src: 'icone-192.png', sizes: '192x192', type: 'image/png' },
-          { src: 'icone-512.png', sizes: '512x512', type: 'image/png' },
+          { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
         ],
       },
       workbox: {

@@ -1,4 +1,4 @@
-import { createApp } from './criar-app.js';
+import { createApp } from './create-app.js';
 import { createLogger, NestPinoLogger } from './common/logger.js';
 import { initSentry } from './common/sentry.js';
 import { loadConfig } from './config.js';

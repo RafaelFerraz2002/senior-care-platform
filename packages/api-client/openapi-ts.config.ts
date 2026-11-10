@@ -1,7 +1,7 @@
 import { defineConfig } from '@hey-api/openapi-ts';
 
 // Gera o cliente a partir do OpenAPI da API. O src/ é gerado: nunca se edita à mão
-// (regenera-se com `pnpm gerar:api-client` na raiz).
+// (regenera-se com `pnpm generate:api-client` na raiz).
 export default defineConfig({
   input: '../../apps/api/openapi.json',
   output: {

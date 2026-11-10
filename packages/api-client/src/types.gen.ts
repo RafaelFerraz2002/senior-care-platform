@@ -4,9 +4,9 @@ export type ClientOptions = {
     baseUrl: string;
 };
 
-export type SaudeResposta = {
-    baseDeDados: 'ok' | 'erro';
-    estado: 'ok' | 'erro';
+export type SaudeResponse = {
+    database: 'ok' | 'error';
+    status: 'ok' | 'error';
 };
 
 export type GetSaudeData = {
@@ -20,7 +20,7 @@ export type GetSaudeErrors = {
     /**
      * A API responde, mas a base de dados não.
      */
-    503: SaudeResposta;
+    503: SaudeResponse;
 };
 
 export type GetSaudeError = GetSaudeErrors[keyof GetSaudeErrors];
@@ -29,7 +29,7 @@ export type GetSaudeResponses = {
     /**
      * A API e a base de dados estão a responder.
      */
-    200: SaudeResposta;
+    200: SaudeResponse;
 };
 
 export type GetSaudeResponse = GetSaudeResponses[keyof GetSaudeResponses];

@@ -1,4 +1,4 @@
-# Gerados (pnpm gerar:api-client): nunca se editam à mão nem se reformatam.
+# Gerados (pnpm generate:api-client): nunca se editam à mão nem se reformatam.
 apps/api/openapi.json
 packages/api-client/src/
 

@@ -12,11 +12,11 @@
     "lint": "eslint .",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
-    "test:integracao": "turbo run test:integracao",
+    "test:integration": "turbo run test:integration",
     "test:e2e": "turbo run test:e2e",
-    "test:tudo": "turbo run test test:integracao test:e2e",
-    "gerar:api-client": "turbo run build --filter=@scp/api && pnpm --filter @scp/api gerar:openapi && pnpm --filter @scp/api-client gerar",
-    "verificar:tamanho": "node scripts/verificar-tamanho.mjs",
+    "test:all": "turbo run test test:integration test:e2e",
+    "generate:api-client": "turbo run build --filter=@scp/api && pnpm --filter @scp/api generate:openapi && pnpm --filter @scp/api-client generate",
+    "check:size": "node scripts/check-size.mjs",
     "prepare": "lefthook install"
   },
   "devDependencies": {

@@ -2,13 +2,13 @@ import { z } from 'zod';
 
 /**
  * Resposta de `GET /saude`: estado geral da API e da ligação à base de dados.
- * O `id` dá o nome ao schema no OpenAPI (`#/components/schemas/SaudeResposta`) e no cliente gerado.
+ * O `id` dá o nome ao schema no OpenAPI (`#/components/schemas/SaudeResponse`) e no cliente gerado.
  */
-export const saudeRespostaSchema = z
+export const saudeResponseSchema = z
   .object({
-    estado: z.enum(['ok', 'erro']),
-    baseDeDados: z.enum(['ok', 'erro']),
+    status: z.enum(['ok', 'error']),
+    database: z.enum(['ok', 'error']),
   })
-  .meta({ id: 'SaudeResposta' });
+  .meta({ id: 'SaudeResponse' });
 
-export type SaudeResposta = z.infer<typeof saudeRespostaSchema>;
+export type SaudeResponse = z.infer<typeof saudeResponseSchema>;

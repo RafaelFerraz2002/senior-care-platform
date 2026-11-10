@@ -1,5 +1,5 @@
 {
-  "name": "@scp/dados-ficticios",
+  "name": "@scp/fake-data",
   "version": "0.0.0",
   "private": true,
   "type": "module",

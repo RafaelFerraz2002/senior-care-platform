@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, devices } from '@playwright/test';
 
-import { portaGestao, portaRegisto, urlGestao, urlRegisto } from './portas.js';
+import { portaGestao, portaRegisto, urlGestao, urlRegisto } from './ports.js';
 
 const raiz = fileURLToPath(new URL('..', import.meta.url));
 
@@ -16,7 +16,7 @@ const env = { API_PORT: portaApi };
 const reuseExistingServer = !process.env.CI;
 
 export default defineConfig({
-  testDir: './testes',
+  testDir: './tests',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',

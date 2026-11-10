@@ -54,7 +54,7 @@ export class NestPinoLogger implements LoggerService {
     const contexto =
       typeof candidato === 'string' && !candidato.includes('\n') ? candidato : undefined;
     // A mensagem é registada tal como vem: não pode levar dados pessoais. Erros da base de dados
-    // registam-se só pelo `code` (como faz o `base-de-dados`), nunca pela mensagem do driver.
+    // registam-se só pelo `code` (como faz o `database`), nunca pela mensagem do driver.
     const texto =
       typeof mensagem === 'string'
         ? mensagem

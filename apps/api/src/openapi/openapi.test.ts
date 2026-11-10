@@ -3,8 +3,8 @@ import { readFile } from 'node:fs/promises';
 import type { INestApplication } from '@nestjs/common';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { createApp } from '../criar-app.js';
-import { generateOpenApiDocument, openApiPath } from './gerar-openapi.js';
+import { createApp } from '../create-app.js';
+import { generateOpenApiDocument, openApiPath } from './generate-openapi.js';
 
 describe('OpenAPI', () => {
   let app: INestApplication;
@@ -24,7 +24,7 @@ describe('OpenAPI', () => {
     expect(generateOpenApiDocument(app)).toEqual(committed);
   });
 
-  it('documenta GET /saude com o schema SaudeResposta', () => {
+  it('documenta GET /saude com o schema SaudeResponse', () => {
     const document = generateOpenApiDocument(app);
 
     expect(document.paths['/saude']?.get).toMatchObject({
@@ -32,18 +32,18 @@ describe('OpenAPI', () => {
       responses: {
         '200': {
           content: {
-            'application/json': { schema: { $ref: '#/components/schemas/SaudeResposta' } },
+            'application/json': { schema: { $ref: '#/components/schemas/SaudeResponse' } },
           },
         },
         '503': {
           content: {
-            'application/json': { schema: { $ref: '#/components/schemas/SaudeResposta' } },
+            'application/json': { schema: { $ref: '#/components/schemas/SaudeResponse' } },
           },
         },
       },
     });
-    expect(document.components?.schemas?.['SaudeResposta']).toMatchObject({
-      properties: { estado: expect.any(Object), baseDeDados: expect.any(Object) },
+    expect(document.components?.schemas?.['SaudeResponse']).toMatchObject({
+      properties: { status: expect.any(Object), database: expect.any(Object) },
     });
   });
 });
