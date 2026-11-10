@@ -46,11 +46,11 @@ Nas regras de negócio e nas correções de bugs, o teste escreve-se primeiro e 
 
 ## Exceções a checks
 
-Nunca se cria uma exceção a um check por iniciativa própria: subir um valor de referência (como o de `tamanho-apps.json`), acrescentar um `v8 ignore` ou pôr um teste em quarentena. Pergunta-se primeiro ao dono, com o motivo. Os testes de segurança e RGPD não têm exceção.
+Nunca se cria uma exceção a um check por iniciativa própria: subir um valor de referência (como o de `app-sizes.json`), acrescentar um `v8 ignore` ou pôr um teste em quarentena. Pergunta-se primeiro ao dono, com o motivo. Os testes de segurança e RGPD não têm exceção.
 
 ## Convenção de nomes
 
-O negócio em português, a técnica em inglês. Os detalhes e exemplos estão no [`CLAUDE.md`](CLAUDE.md).
+O negócio em português, a técnica em inglês: se a palavra aparece nos requisitos, no ecrã ou num URL, é português; se não, é inglês. Os nomes dos testes, as mensagens, os comentários e a documentação ficam em português. O formato (`kebab-case` nos ficheiros e pastas, `camelCase`, `PascalCase`, `UPPER_CASE`) é verificado pelo `pnpm lint`. Os detalhes e exemplos estão no [`CLAUDE.md`](CLAUDE.md).
 
 ## Comandos
 

@@ -56,19 +56,19 @@ Os serviços do `docker compose` **ficam a correr** quando se pára o `pnpm dev`
 
 ## Comandos
 
-| Comando                  | O que faz                                                                                 |
-| ------------------------ | ----------------------------------------------------------------------------------------- |
-| `pnpm install`           | Instala as dependências e os hooks do git.                                                |
-| `pnpm dev`               | Serviços, API e apps em modo de desenvolvimento.                                          |
-| `pnpm build`             | Compila as apps e os pacotes.                                                             |
-| `pnpm lint`              | ESLint (inclui a regra de fronteiras entre módulos).                                      |
-| `pnpm typecheck`         | Verificação de tipos.                                                                     |
-| `pnpm test`              | Testes unitários e de componentes. Rápido e sem Docker.                                   |
-| `pnpm test:integracao`   | Testes de integração com Postgres real (precisa de Docker).                               |
-| `pnpm test:e2e`          | Testes ponta a ponta com Playwright (precisa dos serviços e dos browsers, ver abaixo).    |
-| `pnpm test:tudo`         | Unitários, componentes, integração e ponta a ponta (precisa dos serviços, ver abaixo).    |
-| `pnpm gerar:api-client`  | Regenera o `openapi.json` e o cliente da API depois de mudar a API.                       |
-| `pnpm verificar:tamanho` | Mede o JavaScript de cada app e compara com `tamanho-apps.json` (depois de `pnpm build`). |
+| Comando                    | O que faz                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------- |
+| `pnpm install`             | Instala as dependências e os hooks do git.                                             |
+| `pnpm dev`                 | Serviços, API e apps em modo de desenvolvimento.                                       |
+| `pnpm build`               | Compila as apps e os pacotes.                                                          |
+| `pnpm lint`                | ESLint (fronteiras entre módulos e formato dos nomes).                                 |
+| `pnpm typecheck`           | Verificação de tipos.                                                                  |
+| `pnpm test`                | Testes unitários e de componentes. Rápido e sem Docker.                                |
+| `pnpm test:integration`    | Testes de integração com Postgres real (precisa de Docker).                            |
+| `pnpm test:e2e`            | Testes ponta a ponta com Playwright (precisa dos serviços e dos browsers, ver abaixo). |
+| `pnpm test:all`            | Unitários, componentes, integração e ponta a ponta (precisa dos serviços, ver abaixo). |
+| `pnpm generate:api-client` | Regenera o `openapi.json` e o cliente da API depois de mudar a API.                    |
+| `pnpm check:size`          | Mede o JavaScript de cada app e compara com `app-sizes.json` (depois de `pnpm build`). |
 
 Os browsers do Playwright instalam-se uma vez:
 
@@ -76,7 +76,7 @@ Os browsers do Playwright instalam-se uma vez:
 pnpm --filter @scp/e2e exec playwright install chromium webkit
 ```
 
-O `pnpm test:e2e` e o `pnpm test:tudo` precisam dos serviços em pé: corra `docker compose up -d` antes (o `pnpm dev` também os sobe). Sem eles, o `/saude` da API dos testes responde 503 e o Playwright falha ao fim de 120 s com "Timed out waiting for webServer".
+O `pnpm test:e2e` e o `pnpm test:all` precisam dos serviços em pé: corra `docker compose up -d` antes (o `pnpm dev` também os sobe). Sem eles, o `/saude` da API dos testes responde 503 e o Playwright falha ao fim de 120 s com "Timed out waiting for webServer".
 
 Os testes ponta a ponta usam portas próprias, para não apanharem um `pnpm dev` a correr: API 3100 (muda-se com `E2E_API_PORT`), Gestão 4173 e Registo Diário 4174.
 
