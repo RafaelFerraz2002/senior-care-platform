@@ -14,7 +14,7 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
 
   const config: Config = {
     databaseUrl,
-    apiPort: lerPorta(env['API_PORT']),
+    apiPort: readPort(env['API_PORT']),
     logLevel: env['LOG_LEVEL'] ?? 'info',
   };
   const sentryDsn = env['SENTRY_DSN'];
@@ -25,13 +25,13 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
 }
 
 /** Vazio ou ausente dá 3000; caso contrário tem de ser um inteiro entre 1 e 65535. */
-function lerPorta(valor: string | undefined): number {
-  if (valor === undefined || valor === '') {
+function readPort(value: string | undefined): number {
+  if (value === undefined || value === '') {
     return 3000;
   }
-  const porta = Number(valor);
-  if (!/^\d+$/.test(valor) || porta < 1 || porta > 65535) {
-    throw new Error(`API_PORT inválida: ${valor}`);
+  const port = Number(value);
+  if (!/^\d+$/.test(value) || port < 1 || port > 65535) {
+    throw new Error(`API_PORT inválida: ${value}`);
   }
-  return porta;
+  return port;
 }

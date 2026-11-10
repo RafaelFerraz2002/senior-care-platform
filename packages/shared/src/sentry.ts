@@ -27,13 +27,13 @@ export interface SentryEventLike {
 }
 
 /** Opções de init comuns às três apps: sem PII e sem rasto de navegação (pode ter URLs e mensagens com dados). */
-export const opcoesSentrySemPii = {
+export const sentryNoPiiOptions = {
   sendDefaultPii: false,
   maxBreadcrumbs: 0,
 } as const;
 
 /** O SDK do browser preenche o URL com `location.href`, que traz query e fragmento: fica só origem e caminho. */
-function cortarUrl(request: { url?: string }): void {
+function trimUrl(request: { url?: string }): void {
   if (typeof request.url === 'string') {
     request.url = request.url.split(/[?#]/)[0] ?? '';
   }
@@ -49,13 +49,13 @@ export function scrubSentryEvent<T extends SentryEventLike>(event: T): T {
     delete event.request.data;
     delete event.request.env;
     delete event.request.query_string;
-    cortarUrl(event.request);
+    trimUrl(event.request);
   }
   if (event.contexts) {
     delete (event.contexts as { geo?: unknown }).geo;
   }
-  for (const excecao of event.exception?.values ?? []) {
-    for (const frame of excecao.stacktrace?.frames ?? []) {
+  for (const exception of event.exception?.values ?? []) {
+    for (const frame of exception.stacktrace?.frames ?? []) {
       delete frame.vars;
     }
   }

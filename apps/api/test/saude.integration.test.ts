@@ -8,7 +8,7 @@ describe('GET /saude (com Postgres real)', () => {
   let postgres: TestPostgres;
   let app: INestApplication;
   let baseUrl: string;
-  let postgresParado = false;
+  let postgresStopped = false;
 
   beforeAll(async () => {
     postgres = await startTestPostgres();
@@ -19,58 +19,58 @@ describe('GET /saude (com Postgres real)', () => {
 
   afterAll(async () => {
     await app?.close();
-    if (!postgresParado) {
+    if (!postgresStopped) {
       await postgres?.stop();
     }
   });
 
   it('responde ok com a base de dados ligada', async () => {
-    const resposta = await fetch(`${baseUrl}/saude`);
+    const response = await fetch(`${baseUrl}/saude`);
 
-    expect(resposta.status).toBe(200);
-    expect(await resposta.json()).toEqual({ status: 'ok', database: 'ok' });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ status: 'ok', database: 'ok' });
   });
 
   it('liga-se com o papel app, que não é superutilizador', async () => {
     // O pedido ao /saude obriga a pool real da API a ligar-se.
     await fetch(`${baseUrl}/saude`);
 
-    const linhas = await postgres.consultarComoSuperutilizador(
+    const rows = await postgres.queryAsSuperuser(
       `SELECT a.usename, r.rolsuper, r.rolbypassrls
          FROM pg_stat_activity a JOIN pg_roles r ON r.rolname = a.usename
         WHERE a.datname = 'scp_teste' AND a.backend_type = 'client backend'
           AND a.pid <> pg_backend_pid()
         GROUP BY 1, 2, 3`,
     );
-    const todas = await postgres.consultarComoSuperutilizador(
+    const all = await postgres.queryAsSuperuser(
       `SELECT DISTINCT usename FROM pg_stat_activity
         WHERE datname = 'scp_teste' AND backend_type = 'client backend'
           AND pid <> pg_backend_pid()`,
     );
 
-    expect(linhas).toEqual(['app|f|f']);
-    expect(todas).toEqual(['app']);
+    expect(rows).toEqual(['app|f|f']);
+    expect(all).toEqual(['app']);
   });
 
   it('não abre CORS a origens estranhas', async () => {
-    const resposta = await fetch(`${baseUrl}/saude`, {
+    const response = await fetch(`${baseUrl}/saude`, {
       headers: { Origin: 'https://exemplo.invalid' },
     });
 
-    expect(resposta.headers.get('access-control-allow-origin')).toBeNull();
+    expect(response.headers.get('access-control-allow-origin')).toBeNull();
   });
 
   // Este teste fica por último: pára o Postgres.
   it('responde 503 sem derrubar a API quando a base de dados está em baixo', async () => {
     await postgres.stop();
-    postgresParado = true;
+    postgresStopped = true;
 
-    const resposta = await fetch(`${baseUrl}/saude`);
-    expect(resposta.status).toBe(503);
-    expect(await resposta.json()).toEqual({ status: 'error', database: 'error' });
+    const response = await fetch(`${baseUrl}/saude`);
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({ status: 'error', database: 'error' });
 
     // A API continua viva: responde a um segundo pedido (um erro não tratado da pool deitava o processo abaixo).
-    const outra = await fetch(`${baseUrl}/saude`);
-    expect(outra.status).toBe(503);
+    const other = await fetch(`${baseUrl}/saude`);
+    expect(other.status).toBe(503);
   });
 });

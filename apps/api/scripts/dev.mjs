@@ -4,24 +4,24 @@ import { spawn, spawnSync } from 'node:child_process';
 import process from 'node:process';
 
 const tsc = ['exec', 'tsc', '-p', 'tsconfig.build.json'];
-const inicial = spawnSync('pnpm', tsc, { stdio: 'inherit' });
-if (inicial.status !== 0) process.exit(inicial.status ?? 1);
+const initial = spawnSync('pnpm', tsc, { stdio: 'inherit' });
+if (initial.status !== 0) process.exit(initial.status ?? 1);
 
-const filhos = [
+const children = [
   spawn('pnpm', [...tsc, '--watch', '--preserveWatchOutput'], { stdio: 'inherit' }),
   spawn('node', ['--watch', '--watch-path=dist', 'dist/main.js'], { stdio: 'inherit' }),
 ];
-let aTerminar = false;
-function terminar(sinal) {
-  aTerminar = true;
-  for (const filho of filhos) filho.kill(sinal);
+let stopping = false;
+function stop(signal) {
+  stopping = true;
+  for (const child of children) child.kill(signal);
 }
-for (const sinal of ['SIGINT', 'SIGTERM']) process.on(sinal, () => terminar(sinal));
-for (const filho of filhos) {
-  filho.on('exit', (codigo) => {
-    if (!aTerminar) {
-      terminar('SIGTERM');
-      process.exitCode = codigo ?? 1;
+for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => stop(signal));
+for (const child of children) {
+  child.on('exit', (code) => {
+    if (!stopping) {
+      stop('SIGTERM');
+      process.exitCode = code ?? 1;
     }
   });
 }

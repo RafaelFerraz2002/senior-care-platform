@@ -9,6 +9,6 @@ test('a página abre e mostra a API ligada', async ({ page }) => {
   await expect(page.getByText('API ligada')).toBeVisible();
 
   const { violations } = await new AxeBuilder({ page }).analyze();
-  const graves = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
-  expect(graves).toEqual([]);
+  const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
+  expect(serious).toEqual([]);
 });

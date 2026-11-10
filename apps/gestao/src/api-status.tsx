@@ -14,6 +14,6 @@ export function ApiStatus() {
     return <p role="status">A verificar a API…</p>;
   }
 
-  const ligada = data?.database === 'ok';
-  return <p role="status">{ligada ? 'API ligada' : 'API sem ligação'}</p>;
+  const connected = data?.database === 'ok';
+  return <p role="status">{connected ? 'API ligada' : 'API sem ligação'}</p>;
 }

@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import type { ComponentProps } from 'react';
 import { cn } from './utils';
 
-const variantesDoBotao = cva(
+const buttonVariants = cva(
   'inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
@@ -23,12 +23,11 @@ const variantesDoBotao = cva(
   },
 );
 
-export interface ButtonProps
-  extends ComponentProps<'button'>, VariantProps<typeof variantesDoBotao> {
+export interface ButtonProps extends ComponentProps<'button'>, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 
 export function Button({ className, variant, size, asChild = false, ...props }: ButtonProps) {
-  const Componente = asChild ? Slot : 'button';
-  return <Componente className={cn(variantesDoBotao({ variant, size }), className)} {...props} />;
+  const Component = asChild ? Slot : 'button';
+  return <Component className={cn(buttonVariants({ variant, size }), className)} {...props} />;
 }

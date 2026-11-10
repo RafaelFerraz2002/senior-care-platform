@@ -1,7 +1,7 @@
 import base from '@scp/config/eslint/base';
 import react from '@scp/config/eslint/react';
 
-const ficheirosReact = [
+const reactFiles = [
   'apps/gestao/**/*.{ts,tsx}',
   'apps/registo/**/*.{ts,tsx}',
   'packages/ui/**/*.{ts,tsx}',
@@ -25,5 +25,5 @@ export default [
     ],
   },
   ...base,
-  ...react.map((config) => ({ ...config, files: ficheirosReact })),
+  ...react.map((config) => ({ ...config, files: reactFiles })),
 ];

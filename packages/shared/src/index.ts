@@ -1,2 +1,2 @@
 export { saudeResponseSchema, type SaudeResponse } from './saude.js';
-export { opcoesSentrySemPii, scrubSentryEvent, type SentryEventLike } from './sentry.js';
+export { sentryNoPiiOptions, scrubSentryEvent, type SentryEventLike } from './sentry.js';

@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint';
 
 // Raiz do repositório: os padrões dos elementos são relativos a ela, e não ao cwd. Sem isto, o
 // `eslint .` corrido dentro de um pacote (turbo run lint) não reconhece nenhum elemento e não avisa.
-const raizDoRepositorio = fileURLToPath(new URL('../../..', import.meta.url));
+const repoRoot = fileURLToPath(new URL('../../..', import.meta.url));
 
 const typesWithoutDatabase = ['app-api', 'app-web', 'package', 'api-module'];
 
@@ -18,7 +18,7 @@ export default [
     files: ['**/*.{ts,tsx,mjs}'],
     plugins: { boundaries },
     settings: {
-      'boundaries/root-path': raizDoRepositorio,
+      'boundaries/root-path': repoRoot,
       'import/resolver': {
         typescript: { alwaysTryTypes: true },
       },

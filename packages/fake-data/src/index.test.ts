@@ -18,8 +18,8 @@ describe('createFakeDataGenerator', () => {
 
   it('gera datas de nascimento de pessoas idosas', () => {
     const data = createFakeDataGenerator(7).dataNascimento();
-    const idade = 2026 - data.getFullYear();
-    expect(idade).toBeGreaterThanOrEqual(64);
-    expect(idade).toBeLessThanOrEqual(96);
+    const age = 2026 - data.getFullYear();
+    expect(age).toBeGreaterThanOrEqual(64);
+    expect(age).toBeLessThanOrEqual(96);
   });
 });

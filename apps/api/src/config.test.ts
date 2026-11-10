@@ -40,10 +40,10 @@ describe('loadConfig', () => {
   });
 
   it('recusa uma API_PORT inválida', () => {
-    for (const valor of ['abc', '0', '70000', '30.5', '-1']) {
+    for (const value of ['abc', '0', '70000', '30.5', '-1']) {
       expect(() =>
-        loadConfig({ DATABASE_URL: 'postgresql://app:x@localhost:5440/scp', API_PORT: valor }),
-      ).toThrowError(`API_PORT inválida: ${valor}`);
+        loadConfig({ DATABASE_URL: 'postgresql://app:x@localhost:5440/scp', API_PORT: value }),
+      ).toThrowError(`API_PORT inválida: ${value}`);
     }
   });
 });

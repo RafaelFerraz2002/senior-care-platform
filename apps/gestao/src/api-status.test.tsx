@@ -6,17 +6,17 @@ import { ApiStatus } from './api-status';
 
 // QueryClient com os valores por omissão (retry e networkMode incluídos), como em main.tsx:
 // o ApiStatus tem de garantir sozinho que mostra "API sem ligação" depressa e sem rede.
-function renderizar() {
-  const cliente = new QueryClient();
+function renderApiStatus() {
+  const queryClient = new QueryClient();
   render(
-    <QueryClientProvider client={cliente}>
+    <QueryClientProvider client={queryClient}>
       <ApiStatus />
     </QueryClientProvider>,
   );
 }
 
-function resposta(corpo: unknown, status: number) {
-  return new Response(JSON.stringify(corpo), {
+function jsonResponse(body: unknown, status: number) {
+  return new Response(JSON.stringify(body), {
     status,
     headers: { 'Content-Type': 'application/json' },
   });
@@ -33,24 +33,24 @@ describe('ApiStatus', () => {
   it('mostra "API ligada" quando a API responde ok', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue(resposta({ status: 'ok', database: 'ok' }, 200)),
+      vi.fn().mockResolvedValue(jsonResponse({ status: 'ok', database: 'ok' }, 200)),
     );
-    renderizar();
+    renderApiStatus();
     expect(await screen.findByText('API ligada')).toBeInTheDocument();
   });
 
   it('mostra "API sem ligação" quando a API responde 503', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue(resposta({ status: 'error', database: 'error' }, 503)),
+      vi.fn().mockResolvedValue(jsonResponse({ status: 'error', database: 'error' }, 503)),
     );
-    renderizar();
+    renderApiStatus();
     expect(await screen.findByText('API sem ligação')).toBeInTheDocument();
   });
 
   it('mostra "API sem ligação" quando o pedido falha', async () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')));
-    renderizar();
+    renderApiStatus();
     expect(await screen.findByText('API sem ligação')).toBeInTheDocument();
   });
 
@@ -58,7 +58,7 @@ describe('ApiStatus', () => {
     vi.stubGlobal('navigator', { ...navigator, onLine: false });
     onlineManager.setOnline(false);
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')));
-    renderizar();
+    renderApiStatus();
     expect(
       await screen.findByText('API sem ligação', undefined, { timeout: 1500 }),
     ).toBeInTheDocument();

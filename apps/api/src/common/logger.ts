@@ -5,7 +5,7 @@ import { pino, type DestinationStream, type Logger } from 'pino';
  * Caminhos que nunca chegam aos logs (ADR-006, logs e Sentry sem dados pessoais):
  * só IDs, sem corpos, headers de autenticação, cookies nem IP.
  */
-export const caminhosOcultos = [
+export const redactedPaths = [
   'req.headers.authorization',
   'req.headers.cookie',
   'req.body',
@@ -14,53 +14,49 @@ export const caminhosOcultos = [
   'res.headers["set-cookie"]',
 ];
 
-export function createLogger(level: string, destino?: DestinationStream): Logger {
-  return pino({ level, redact: { paths: caminhosOcultos, remove: true } }, destino);
+export function createLogger(level: string, destination?: DestinationStream): Logger {
+  return pino({ level, redact: { paths: redactedPaths, remove: true } }, destination);
 }
 
 /** Adaptador para o Nest escrever pelo pino, com a mesma filtragem. */
 export class NestPinoLogger implements LoggerService {
   constructor(private readonly logger: Logger) {}
 
-  log(mensagem: unknown, ...resto: unknown[]): void {
-    this.escrever('info', mensagem, resto);
+  log(message: unknown, ...rest: unknown[]): void {
+    this.write('info', message, rest);
   }
-  error(mensagem: unknown, ...resto: unknown[]): void {
-    this.escrever('error', mensagem, resto);
+  error(message: unknown, ...rest: unknown[]): void {
+    this.write('error', message, rest);
   }
-  warn(mensagem: unknown, ...resto: unknown[]): void {
-    this.escrever('warn', mensagem, resto);
+  warn(message: unknown, ...rest: unknown[]): void {
+    this.write('warn', message, rest);
   }
-  debug(mensagem: unknown, ...resto: unknown[]): void {
-    this.escrever('debug', mensagem, resto);
+  debug(message: unknown, ...rest: unknown[]): void {
+    this.write('debug', message, rest);
   }
-  fatal(mensagem: unknown, ...resto: unknown[]): void {
-    this.escrever('fatal', mensagem, resto);
+  fatal(message: unknown, ...rest: unknown[]): void {
+    this.write('fatal', message, rest);
   }
-  verbose(mensagem: unknown, ...resto: unknown[]): void {
-    this.escrever('trace', mensagem, resto);
+  verbose(message: unknown, ...rest: unknown[]): void {
+    this.write('trace', message, rest);
   }
 
   // O Nest chama `error(mensagem, pilha, contexto)` e, nos outros níveis, `log(mensagem, contexto)`.
   // Num `error` sem contexto só chega a pilha, por isso o contexto só se lê de `error` com 2 ou mais
   // argumentos extra. A pilha nunca é registada (traz a mensagem do erro e caminhos): fica fora dos logs.
-  private escrever(
-    nivel: 'info' | 'error' | 'warn' | 'debug' | 'trace' | 'fatal',
-    mensagem: unknown,
-    resto: unknown[],
+  private write(
+    level: 'info' | 'error' | 'warn' | 'debug' | 'trace' | 'fatal',
+    message: unknown,
+    rest: unknown[],
   ): void {
-    const minimo = nivel === 'error' ? 2 : 1;
-    const candidato = resto.length >= minimo ? resto.at(-1) : undefined;
-    const contexto =
-      typeof candidato === 'string' && !candidato.includes('\n') ? candidato : undefined;
+    const min = level === 'error' ? 2 : 1;
+    const candidate = rest.length >= min ? rest.at(-1) : undefined;
+    const context =
+      typeof candidate === 'string' && !candidate.includes('\n') ? candidate : undefined;
     // A mensagem é registada tal como vem: não pode levar dados pessoais. Erros da base de dados
-    // registam-se só pelo `code` (como faz o `database`), nunca pela mensagem do driver.
-    const texto =
-      typeof mensagem === 'string'
-        ? mensagem
-        : mensagem instanceof Error
-          ? mensagem.name
-          : 'evento';
-    this.logger[nivel]({ contexto }, texto);
+    // registam-se só pelo `code` (como faz o `DatabaseService`), nunca pela mensagem do driver.
+    const text =
+      typeof message === 'string' ? message : message instanceof Error ? message.name : 'evento';
+    this.logger[level]({ context }, text);
   }
 }

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { scrubSentryEvent } from './sentry.js';
 
-function criarEvento() {
+function createEvent() {
   return {
     event_id: 'abc',
     message: 'erro',
@@ -32,55 +32,55 @@ function criarEvento() {
 
 describe('scrubSentryEvent', () => {
   it('reduz o URL do pedido à origem e ao caminho', () => {
-    const evento = criarEvento();
-    evento.request.url =
+    const event = createEvent();
+    event.request.url =
       'https://gestao.exemplo.invalid/utentes?nome=Maria%20Fict%C3%ADcia#nota=privada';
-    const texto = JSON.stringify(scrubSentryEvent(evento));
-    expect(evento.request.url).toBe('https://gestao.exemplo.invalid/utentes');
-    expect(texto).not.toContain('Maria');
-    expect(texto).not.toContain('privada');
+    const text = JSON.stringify(scrubSentryEvent(event));
+    expect(event.request.url).toBe('https://gestao.exemplo.invalid/utentes');
+    expect(text).not.toContain('Maria');
+    expect(text).not.toContain('privada');
   });
 
   it('corta a query e o fragmento de URLs relativos ou inválidos', () => {
-    for (const [entrada, esperado] of [
+    for (const [input, expected] of [
       ['/utentes?nome=Maria#nota=x', '/utentes'],
       ['/utentes#nota=x', '/utentes'],
       ['nao é um url?segredo=1', 'nao é um url'],
     ] as const) {
-      const evento = criarEvento();
-      evento.request.url = entrada;
-      expect(scrubSentryEvent(evento).request.url).toBe(esperado);
+      const event = createEvent();
+      event.request.url = input;
+      expect(scrubSentryEvent(event).request.url).toBe(expected);
     }
   });
 
   it('apaga os dados extra', () => {
-    const evento = { ...criarEvento(), extra: { nome: 'Maria Fictícia' } };
-    const limpo = scrubSentryEvent(evento);
-    expect(limpo.extra).toBeUndefined();
-    expect(JSON.stringify(limpo)).not.toContain('Maria Fictícia');
+    const event = { ...createEvent(), extra: { nome: 'Maria Fictícia' } };
+    const scrubbed = scrubSentryEvent(event);
+    expect(scrubbed.extra).toBeUndefined();
+    expect(JSON.stringify(scrubbed)).not.toContain('Maria Fictícia');
   });
 
   it('remove utilizador, IP, cookies, headers, corpo e variáveis locais', () => {
-    const limpo = scrubSentryEvent(criarEvento());
-    const texto = JSON.stringify(limpo);
+    const scrubbed = scrubSentryEvent(createEvent());
+    const text = JSON.stringify(scrubbed);
 
-    expect(limpo.user).toBeUndefined();
-    expect(limpo.request.cookies).toBeUndefined();
-    expect(limpo.request.headers).toBeUndefined();
-    expect(limpo.request.data).toBeUndefined();
-    expect(limpo.request.env).toBeUndefined();
-    expect(limpo.contexts.geo).toBeUndefined();
-    expect(limpo.exception.values[0]?.stacktrace.frames[0]?.vars).toBeUndefined();
-    expect(texto).not.toContain('Maria Fictícia');
-    expect(texto).not.toContain('Bearer');
-    expect(texto).not.toContain('203.0.113.7');
+    expect(scrubbed.user).toBeUndefined();
+    expect(scrubbed.request.cookies).toBeUndefined();
+    expect(scrubbed.request.headers).toBeUndefined();
+    expect(scrubbed.request.data).toBeUndefined();
+    expect(scrubbed.request.env).toBeUndefined();
+    expect(scrubbed.contexts.geo).toBeUndefined();
+    expect(scrubbed.exception.values[0]?.stacktrace.frames[0]?.vars).toBeUndefined();
+    expect(text).not.toContain('Maria Fictícia');
+    expect(text).not.toContain('Bearer');
+    expect(text).not.toContain('203.0.113.7');
   });
 
   it('mantém o que é útil e não é pessoal', () => {
-    const limpo = scrubSentryEvent(criarEvento());
-    expect(limpo.tags).toEqual({ organizacao: 'org-1', pedido: 'ped-1' });
-    expect(limpo.request.url).toBe('/utentes');
-    expect(limpo.contexts.runtime).toEqual({ name: 'node' });
+    const scrubbed = scrubSentryEvent(createEvent());
+    expect(scrubbed.tags).toEqual({ organizacao: 'org-1', pedido: 'ped-1' });
+    expect(scrubbed.request.url).toBe('/utentes');
+    expect(scrubbed.contexts.runtime).toEqual({ name: 'node' });
   });
 
   it('aceita eventos sem os campos opcionais', () => {

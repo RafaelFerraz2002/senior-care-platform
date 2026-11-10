@@ -22,8 +22,8 @@ export class DatabaseService implements OnModuleDestroy {
     });
     // Sem este handler, uma ligação inativa que caia (base de dados em baixo) deitava o processo abaixo.
     // Só se regista o código do erro: a mensagem pode trazer o anfitrião ou o utilizador.
-    this.pool.on('error', (erro: Error & { code?: string }) => {
-      this.logger.warn(`Ligação à base de dados perdida (${erro.code ?? 'sem código'})`);
+    this.pool.on('error', (error: Error & { code?: string }) => {
+      this.logger.warn(`Ligação à base de dados perdida (${error.code ?? 'sem código'})`);
     });
   }
 

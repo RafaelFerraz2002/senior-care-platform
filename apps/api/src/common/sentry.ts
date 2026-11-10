@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/node';
-import { opcoesSentrySemPii, scrubSentryEvent } from '@scp/shared';
+import { sentryNoPiiOptions, scrubSentryEvent } from '@scp/shared';
 
 import type { Config } from '../config.js';
 
@@ -10,9 +10,9 @@ export function initSentry(config: Config): boolean {
   }
   Sentry.init({
     dsn: config.sentryDsn,
-    ...opcoesSentrySemPii,
+    ...sentryNoPiiOptions,
     includeLocalVariables: false,
-    beforeSend: (evento) => scrubSentryEvent(evento),
+    beforeSend: (event) => scrubSentryEvent(event),
   });
   return true;
 }
