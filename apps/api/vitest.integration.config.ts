@@ -7,7 +7,12 @@ export default defineConfig({
   test: {
     coverage: coverage('integration'),
     // Testes de integração: precisam do Docker (Testcontainers) e correm só com `pnpm test:integration`.
-    include: ['test/**/*.integration.test.ts', 'test/**/*.seguranca.test.ts'],
+    // Os testes de segurança (`*.seguranca.test.ts`) vivem em `test/` ou ao lado do código, em `src/`.
+    include: [
+      'test/**/*.integration.test.ts',
+      'test/**/*.seguranca.test.ts',
+      'src/**/*.seguranca.test.ts',
+    ],
     // O primeiro arranque pode ter de descarregar a imagem do Postgres.
     hookTimeout: 180_000,
     testTimeout: 60_000,
