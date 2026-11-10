@@ -1,0 +1,16 @@
+packages:
+  - apps/*
+  - packages/*
+  - e2e
+
+allowBuilds:
+  lefthook: true
+  '@swc/core': true
+  esbuild: true
+  # Telemetria do swagger-ui-dist (dependência do @nestjs/swagger): não corre.
+  '@scarf/scarf': false
+  # Scripts opcionais (compilação nativa/postinstall) que não fazem falta: cpu-features e ssh2
+  # (e o protobufjs) chegam só pelo Testcontainers, nas dependências de desenvolvimento da API.
+  cpu-features: false
+  protobufjs: false
+  ssh2: false

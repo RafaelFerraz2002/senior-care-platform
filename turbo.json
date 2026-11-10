@@ -1,0 +1,49 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "tasks": {
+    "dev": {
+      "dependsOn": ["^build"],
+      "persistent": true,
+      "cache": false,
+      "passThroughEnv": ["API_PORT", "DATABASE_URL", "LOG_LEVEL", "SENTRY_DSN", "VITE_SENTRY_DSN"]
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "env": ["VITE_*"],
+      "outputs": ["dist/**"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"]
+    },
+    "test:integration": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "passThroughEnv": [
+        "API_PORT",
+        "DATABASE_URL",
+        "DOCKER_*",
+        "E2E_API_PORT",
+        "LOG_LEVEL",
+        "PLAYWRIGHT_*",
+        "TESTCONTAINERS_*"
+      ]
+    },
+    "test:e2e": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "passThroughEnv": [
+        "API_PORT",
+        "DATABASE_URL",
+        "DOCKER_*",
+        "E2E_API_PORT",
+        "LOG_LEVEL",
+        "PLAYWRIGHT_*",
+        "TESTCONTAINERS_*"
+      ]
+    }
+  }
+}

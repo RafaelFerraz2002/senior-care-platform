@@ -1,0 +1,5 @@
+{
+  "extends": "@scp/config/tsconfig.web.json",
+  "compilerOptions": { "types": [] },
+  "include": ["src"]
+}

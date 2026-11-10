@@ -1,0 +1,5 @@
+{
+  "extends": "@scp/config/tsconfig.web.json",
+  "compilerOptions": { "types": ["vite/client", "@testing-library/jest-dom"] },
+  "include": ["src", "vite.config.ts", "vitest.setup.ts"]
+}

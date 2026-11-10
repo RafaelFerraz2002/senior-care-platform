@@ -1,0 +1,12 @@
+# Gerados (pnpm generate:api-client): nunca se editam à mão nem se reformatam.
+apps/api/openapi.json
+packages/api-client/src/
+
+# Escrito pelo pnpm.
+pnpm-lock.yaml
+
+# Gerado pelo TanStack Router (commitado, nunca se edita à mão).
+**/routeTree.gen.ts
+
+# ADRs aceites não se reescrevem: o Prettier não lhes mexe
+docs/adr/

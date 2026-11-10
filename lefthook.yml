@@ -1,0 +1,15 @@
+pre-commit:
+  # Em sequência e por esta ordem: o Prettier e o ESLint mexem nos mesmos ficheiros e, em paralelo,
+  # um podia escrever por cima das correções do outro.
+  piped: true
+  commands:
+    prettier:
+      priority: 1
+      glob: '*.{ts,tsx,mjs,json,md,yml}'
+      run: pnpm exec prettier --write {staged_files}
+      stage_fixed: true
+    eslint:
+      priority: 2
+      glob: '*.{ts,tsx,mjs}'
+      run: pnpm exec eslint --fix --no-warn-ignored {staged_files}
+      stage_fixed: true

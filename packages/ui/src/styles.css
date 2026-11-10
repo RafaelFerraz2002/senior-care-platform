@@ -1,0 +1,25 @@
+@import 'tailwindcss';
+
+/* Tailwind deteta as classes dos ficheiros deste pacote, mesmo importado a partir das apps. */
+@source '.';
+
+/* Tokens do tema (contrastes AA verificados para texto normal). */
+@theme {
+  --color-background: #ffffff;
+  --color-foreground: #171717;
+  --color-primary: #1d4ed8;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #f1f5f9;
+  --color-secondary-foreground: #0f172a;
+  --color-muted-foreground: #475569;
+  --color-border: #cbd5e1;
+  --color-ring: #1d4ed8;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: system-ui, sans-serif;
+  }
+}

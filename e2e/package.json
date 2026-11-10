@@ -1,0 +1,21 @@
+{
+  "name": "@scp/e2e",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@playwright/test": "1.64.1",
+    "@scp/api": "workspace:*",
+    "@scp/config": "workspace:*",
+    "@scp/gestao": "workspace:*",
+    "@scp/registo": "workspace:*",
+    "@types/node": "26.6.6",
+    "typescript": "~6.0.3"
+  }
+}

@@ -1,6 +1,6 @@
 # ADR-005: Estratégia de testes
 
-- **Estado:** Proposto
+- **Estado:** Aceite
 - **Data:** 2026-10-31
 - **Ticket:** [#22](https://github.com/RafaelFerraz2002/senior-care-platform/issues/22) (épico [#1](https://github.com/RafaelFerraz2002/senior-care-platform/issues/1))
 - **Requisitos:** —
