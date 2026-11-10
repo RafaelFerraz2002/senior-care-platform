@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
+      contents: read
       pull-requests: read
     steps:
       # Conventional Commits; o âmbito é opcional e o assunto não tem regra de maiúsculas.
