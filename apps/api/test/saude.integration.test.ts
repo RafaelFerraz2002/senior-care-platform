@@ -38,13 +38,13 @@ describe('GET /saude (com Postgres real)', () => {
     const rows = await postgres.queryAsSuperuser(
       `SELECT a.usename, r.rolsuper, r.rolbypassrls
          FROM pg_stat_activity a JOIN pg_roles r ON r.rolname = a.usename
-        WHERE a.datname = 'scp_teste' AND a.backend_type = 'client backend'
+        WHERE a.datname = 'scp_test' AND a.backend_type = 'client backend'
           AND a.pid <> pg_backend_pid()
         GROUP BY 1, 2, 3`,
     );
     const all = await postgres.queryAsSuperuser(
       `SELECT DISTINCT usename FROM pg_stat_activity
-        WHERE datname = 'scp_teste' AND backend_type = 'client backend'
+        WHERE datname = 'scp_test' AND backend_type = 'client backend'
           AND pid <> pg_backend_pid()`,
     );
 

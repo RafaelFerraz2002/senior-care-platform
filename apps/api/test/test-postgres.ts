@@ -4,7 +4,7 @@ import { PostgreSqlContainer } from '@testcontainers/postgresql';
 
 const initDir = fileURLToPath(new URL('../../../docker/postgres/init', import.meta.url));
 
-const database = 'scp_teste';
+const database = 'scp_test';
 const superuserPassword = 'superutilizador-de-teste';
 const appPassword = 'app-de-teste';
 // Mensagem do Testcontainers quando não encontra nenhum Docker a correr.

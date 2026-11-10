@@ -5,13 +5,13 @@ export interface FakeDataGenerator {
   dataNascimento(): Date;
 }
 
-/**
- * FakeDataGenerator de dados fictícios (nunca reais) para seeds, testes e demonstrações.
- * Cada gerador tem a sua própria instância do faker: a mesma semente dá sempre os mesmos dados.
- */
 /** Data de referência fixa, para as datas geradas dependerem só da semente e não do relógio. */
 const referenceDate = new Date('2026-01-01T00:00:00Z');
 
+/**
+ * Gerador de dados fictícios (nunca reais) para seeds, testes e demonstrações.
+ * Cada gerador tem a sua própria instância do faker: a mesma semente dá sempre os mesmos dados.
+ */
 export function createFakeDataGenerator(seed: number): FakeDataGenerator {
   const faker = new Faker({ locale: [pt_PT] });
   faker.seed(seed);
