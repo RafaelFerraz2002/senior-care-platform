@@ -6,8 +6,6 @@ on:
   schedule:
     - cron: '0 3 * * *'
   workflow_dispatch:
-  push:
-    branches: ['ci/#18-lint-testes']
 
 permissions:
   contents: read
@@ -73,7 +71,6 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/setup
       - run: pnpm audit --audit-level high
-      - run: exit 1 # temporário: prova do issue automático
 
   issue:
     needs: [e2e-browsers, dependencias]
