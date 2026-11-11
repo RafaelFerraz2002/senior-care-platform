@@ -9,9 +9,10 @@
     "start": "node dist/main.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "vitest run",
+    "test": "vitest run --exclude '**/*.seguranca.test.ts'",
     "generate:openapi": "node dist/openapi/generate-openapi.js",
-    "test:integration": "vitest run --config vitest.integration.config.ts"
+    "test:integration": "vitest run --exclude '**/*.seguranca.test.ts' --config vitest.integration.config.ts",
+    "test:seguranca": "vitest run seguranca.test --passWithNoTests --coverage.reportsDirectory=coverage/seguranca --config vitest.integration.config.ts"
   },
   "dependencies": {
     "@nestjs/common": "12.3.2",
@@ -31,6 +32,7 @@
     "@testcontainers/postgresql": "12.2.1",
     "@types/node": "26.6.6",
     "@types/pg": "8.23.1",
+    "@vitest/coverage-v8": "5.1.0",
     "testcontainers": "12.2.1",
     "typescript": "~6.0.3",
     "unplugin-swc": "2.0.0",

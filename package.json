@@ -13,8 +13,9 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "test:integration": "turbo run test:integration",
+    "test:seguranca": "turbo run test:seguranca",
     "test:e2e": "turbo run test:e2e",
-    "test:all": "turbo run test test:integration test:e2e",
+    "test:all": "turbo run test test:integration test:seguranca test:e2e",
     "generate:api-client": "turbo run build --filter=@scp/api && pnpm --filter @scp/api generate:openapi && pnpm --filter @scp/api-client generate",
     "check:size": "node scripts/check-size.mjs",
     "prepare": "lefthook install"

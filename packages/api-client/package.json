@@ -17,7 +17,8 @@
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "vitest run --exclude '**/*.seguranca.test.ts'",
+    "test:seguranca": "vitest run seguranca.test --passWithNoTests --coverage.reportsDirectory=coverage/seguranca"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.0.0"

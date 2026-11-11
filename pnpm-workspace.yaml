@@ -14,3 +14,14 @@ allowBuilds:
   cpu-features: false
   protobufjs: false
   ssh2: false
+
+# js-yaml 4.2.0 tem as vulnerabilidades GHSA-52cp-r559-cp3m, GHSA-5p4m-2wfm-xmqj e GHSA-2883-xcg3-v3hh.
+# Chega pelo @hey-api/json-schema-ref-parser (gerador do cliente da API), que o fixa nessa versão.
+# Remover quando o @hey-api/openapi-ts passar a trazer um js-yaml corrigido.
+overrides:
+  'js-yaml@4.2.0': 4.3.2
+
+# Cada entrada é uma exceção ao check `dependencias` (pnpm audit): só com autorização do dono,
+# com o motivo e a data de revisão na mesma linha (ADR-005, testes).
+auditConfig:
+  ignoreGhsas: []

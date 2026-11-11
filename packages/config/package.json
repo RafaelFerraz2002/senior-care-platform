@@ -8,7 +8,11 @@
     "./tsconfig.web.json": "./tsconfig.web.json",
     "./eslint/base": "./eslint/base.mjs",
     "./eslint/react": "./eslint/react.mjs",
-    "./prettier": "./prettier.mjs"
+    "./prettier": "./prettier.mjs",
+    "./vitest/coverage": {
+      "types": "./vitest/coverage.d.mts",
+      "default": "./vitest/coverage.mjs"
+    }
   },
   "dependencies": {
     "@eslint/js": "10.0.1",
