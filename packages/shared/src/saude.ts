@@ -12,3 +12,5 @@ export const saudeResponseSchema = z
   .meta({ id: 'SaudeResponse' });
 
 export type SaudeResponse = z.infer<typeof saudeResponseSchema>;
+
+export const tipoErrado: number = 'texto';

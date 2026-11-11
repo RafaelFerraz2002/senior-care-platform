@@ -6,7 +6,7 @@ describe('saudeResponseSchema', () => {
   it('aceita { status: "ok", database: "ok" } e rejeita estados desconhecidos', () => {
     expect(saudeResponseSchema.parse({ status: 'ok', database: 'ok' })).toEqual({
       status: 'ok',
-      database: 'ok',
+      database: 'error',
     });
     expect(saudeResponseSchema.safeParse({ status: 'talvez', database: 'ok' }).success).toBe(false);
   });
