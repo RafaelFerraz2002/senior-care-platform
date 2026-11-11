@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { mergeLcov, rewriteLcovPaths, sumLcov } from './lcov.ts';
+import { globalDoLcov, mergeLcov, pacoteDoLcov, rewriteLcovPaths, sumLcov } from './lcov.ts';
 
 function registo(ficheiro: string, linhas: [number, number][]): string {
   const cobertas = linhas.filter(([, n]) => n > 0).length;
@@ -77,5 +77,25 @@ describe('sumLcov', () => {
 
   it('dá 100% quando não há linhas', () => {
     expect(sumLcov('')).toEqual({ linhas: 0, cobertas: 0, percentagem: 100 });
+  });
+});
+
+describe('pacoteDoLcov', () => {
+  it('devolve a pasta do pacote a partir do caminho do lcov.info', () => {
+    expect(pacoteDoLcov('/repo', '/repo/apps/api/coverage/unit/lcov.info')).toBe('apps/api');
+    expect(pacoteDoLcov('/repo/', '/repo/packages/ci/coverage/seguranca/lcov.info')).toBe(
+      'packages/ci',
+    );
+  });
+});
+
+describe('globalDoLcov', () => {
+  it('dá a percentagem global do lcov', () => {
+    expect(globalDoLcov(registo('a.ts', linhasNumeradas(1, 10, 5)))).toBe(50);
+  });
+
+  it('não dá percentagem quando o lcov falta ou não tem linhas', () => {
+    expect(globalDoLcov(null)).toBeNull();
+    expect(globalDoLcov('')).toBeNull();
   });
 });

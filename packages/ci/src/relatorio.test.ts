@@ -20,7 +20,7 @@ describe('buildRelatorio', () => {
     expect(texto).toBe(`## Relatório do CI
 
 **Cobertura das linhas alteradas:** 85,0% (40 linhas; mínimo 80%)
-**Cobertura global (informativa):** 72,3%
+**Cobertura global dos pacotes testados neste PR (informativa):** 72,3%
 
 ### Exceções introduzidas por este PR
 

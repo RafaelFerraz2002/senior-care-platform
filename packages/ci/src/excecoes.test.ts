@@ -92,6 +92,21 @@ describe('findExcecoes', () => {
     ]);
   });
 
+  it('não marca comentários do pnpm-workspace.yaml que citam um aviso', () => {
+    const diff = diffDe('pnpm-workspace.yaml', '@@ -5,0 +6,1 @@', [
+      '+# Sem GHSA-xxxx-yyyy-zzzz ignorados: o audit falha.',
+    ]);
+    expect(findExcecoes(diff)).toEqual([]);
+  });
+
+  it('não marca os ficheiros do relatório, que citam os padrões de propósito', () => {
+    const diff = [
+      diffDe('packages/ci/src/relatorio.ts', '@@ -0,0 +1,1 @@', ['+// eslint-disable']),
+      diffDe('packages/ci/src/relatorio.test.ts', '@@ -0,0 +1,1 @@', ['+// v8 ignore next']),
+    ].join('\n');
+    expect(findExcecoes(diff)).toEqual([]);
+  });
+
   it('não marca padrões citados em documentação', () => {
     const diff = diffDe('CONTRIBUTING.md', '@@ -0,0 +1,1 @@', ['+Não uses eslint-disable.']);
     expect(findExcecoes(diff)).toEqual([]);

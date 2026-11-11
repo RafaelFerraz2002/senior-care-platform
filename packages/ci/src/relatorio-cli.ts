@@ -2,14 +2,14 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { parseArgs } from 'node:util';
 import { findExcecoes } from './excecoes.ts';
-import { sumLcov } from './lcov.ts';
+import { globalDoLcov } from './lcov.ts';
 import { buildRelatorio, type DadosRelatorio } from './relatorio.ts';
 
 const MINIMO_COBERTURA = 80;
 
 const { values } = parseArgs({
   options: {
-    lcov: { type: 'string' },
+    'lcov-global': { type: 'string' },
     'diff-cover': { type: 'string' },
     diff: { type: 'string' },
     saida: { type: 'string' },
@@ -27,15 +27,16 @@ function alteradasDoDiffCover(json: string | null): DadosRelatorio['alteradas'] 
 }
 
 if (values.saida === undefined) {
-  console.error('Uso: relatorio-cli.ts --lcov <f> --diff-cover <json> --diff <f> --saida <md>');
+  console.error(
+    'Uso: relatorio-cli.ts --lcov-global <f> --diff-cover <json> --diff <f> --saida <md>',
+  );
   process.exit(1);
 }
 
-const lcov = readSeExiste(values.lcov);
 const diff = readSeExiste(values.diff);
 const texto = buildRelatorio({
   alteradas: alteradasDoDiffCover(readSeExiste(values['diff-cover'])),
-  global: lcov === null ? null : sumLcov(lcov).percentagem,
+  global: globalDoLcov(readSeExiste(values['lcov-global'])),
   excecoes: diff === null ? [] : findExcecoes(diff),
   minimo: MINIMO_COBERTURA,
 });

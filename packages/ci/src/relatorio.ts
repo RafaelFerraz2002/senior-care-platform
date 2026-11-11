@@ -58,7 +58,9 @@ function secaoExcecoes(excecoes: Excecao[]): string[] {
 export function buildRelatorio(dados: DadosRelatorio): string {
   const cobertura = [linhaAlteradas(dados)];
   if (dados.global !== null) {
-    cobertura.push(`**Cobertura global (informativa):** ${formatPercentagem(dados.global)}`);
+    cobertura.push(
+      `**Cobertura global dos pacotes testados neste PR (informativa):** ${formatPercentagem(dados.global)}`,
+    );
   }
   return ['## Relatório do CI', '', ...cobertura, '', ...secaoExcecoes(dados.excecoes), ''].join(
     '\n',

@@ -1,7 +1,7 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { COUNTED_PACKAGES, mergeLcov, rewriteLcovPaths } from './lcov.ts';
+import { mergeLcov, pacoteDoLcov, rewriteLcovPaths } from './lcov.ts';
 
 const REPO_ROOT = fileURLToPath(new URL('../../..', import.meta.url));
 
@@ -10,13 +10,24 @@ function writeSaida(saida: string, conteudo: string): void {
   writeFileSync(saida, conteudo);
 }
 
-function collect(tipo: string, saida: string): void {
-  const conteudos = COUNTED_PACKAGES.flatMap((pacote) => {
-    const ficheiro = join(REPO_ROOT, pacote, 'coverage', tipo, 'lcov.info');
-    return existsSync(ficheiro)
-      ? [rewriteLcovPaths(readFileSync(ficheiro, 'utf8'), pacote, REPO_ROOT)]
-      : [];
+/**
+ * Descobre `{apps,packages}/*\/coverage/<tipo>/lcov.info`. O que conta é definido só pelo
+ * `coverage.include` do vitest de cada pacote: sem `coverage(...)` não há lcov e o pacote fica de fora.
+ */
+function findLcovs(tipo: string): string[] {
+  return ['apps', 'packages'].flatMap((grupo) => {
+    const pasta = join(REPO_ROOT, grupo);
+    if (!existsSync(pasta)) return [];
+    return readdirSync(pasta)
+      .map((nome) => join(pasta, nome, 'coverage', tipo, 'lcov.info'))
+      .filter((ficheiro) => existsSync(ficheiro));
   });
+}
+
+function collect(tipo: string, saida: string): void {
+  const conteudos = findLcovs(tipo).map((ficheiro) =>
+    rewriteLcovPaths(readFileSync(ficheiro, 'utf8'), pacoteDoLcov(REPO_ROOT, ficheiro), REPO_ROOT),
+  );
   if (conteudos.length === 0) console.log(`Sem cobertura de ${tipo}.`);
   writeSaida(saida, mergeLcov(conteudos));
 }

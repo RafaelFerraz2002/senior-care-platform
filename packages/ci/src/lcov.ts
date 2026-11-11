@@ -1,12 +1,3 @@
-export const COUNTED_PACKAGES = [
-  'apps/api',
-  'apps/gestao',
-  'apps/registo',
-  'packages/shared',
-  'packages/fake-data',
-  'packages/ci',
-];
-
 export interface SomaLcov {
   linhas: number;
   cobertas: number;
@@ -82,4 +73,18 @@ export function sumLcov(lcov: string): SomaLcov {
     cobertas += [...doFicheiro.values()].filter((vezes) => vezes > 0).length;
   }
   return { linhas, cobertas, percentagem: linhas === 0 ? 100 : (cobertas / linhas) * 100 };
+}
+
+/** Percentagem global de um lcov; sem lcov ou sem linhas não há percentagem (nunca 100%). */
+export function globalDoLcov(lcov: string | null): number | null {
+  if (lcov === null) return null;
+  const soma = sumLcov(lcov);
+  return soma.linhas === 0 ? null : soma.percentagem;
+}
+
+/** Pasta do pacote (relativa à raiz) a que pertence um `<pacote>/coverage/<tipo>/lcov.info`. */
+export function pacoteDoLcov(repoRoot: string, ficheiro: string): string {
+  const raiz = `${repoRoot.replaceAll('\\', '/').replace(/\/+$/, '')}/`;
+  const relativo = ficheiro.replaceAll('\\', '/').slice(raiz.length);
+  return relativo.slice(0, relativo.indexOf('/coverage/'));
 }
