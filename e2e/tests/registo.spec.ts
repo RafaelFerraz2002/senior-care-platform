@@ -22,7 +22,7 @@ test('abre sem rede depois da primeira visita e mostra "API sem ligação"', asy
 }) => {
   test.skip(
     browserName === 'firefox',
-    'Limitação do Playwright no Firefox: o setOffline não se aplica ao reload (o documento e a API chegam pela rede). O alvo do Registo Diário é o iPad (WebKit), onde o teste passa. https://github.com/microsoft/playwright/issues/37295',
+    'Limitação do Playwright no Firefox: o setOffline não se aplica ao reload (o documento e a API chegam pela rede). O alvo do Registo Diário é o iPad (WebKit), onde o teste passa. Relacionado: https://github.com/microsoft/playwright/issues/37295',
   );
   await page.goto(url);
   await expect(page.getByText('API ligada')).toBeVisible();

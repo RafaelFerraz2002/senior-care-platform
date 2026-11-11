@@ -65,7 +65,7 @@ Os serviços do `docker compose` **ficam a correr** quando se pára o `pnpm dev`
 | `pnpm typecheck`           | Verificação de tipos.                                                                             |
 | `pnpm test`                | Testes unitários e de componentes. Rápido e sem Docker.                                           |
 | `pnpm test:integration`    | Testes de integração com Postgres real (precisa de Docker).                                       |
-| `pnpm test:seguranca`      | Testes de segurança (`*.seguranca.test.ts`).                                                      |
+| `pnpm test:seguranca`      | Testes de segurança (`*.seguranca.test.ts`; precisa de Docker, usa a configuração de integração). |
 | `pnpm test:e2e`            | Testes ponta a ponta com Playwright (precisa dos serviços e dos browsers, ver abaixo).            |
 | `pnpm test:all`            | Unitários, componentes, integração, segurança e ponta a ponta (precisa dos serviços, ver abaixo). |
 | `pnpm generate:api-client` | Regenera o `openapi.json` e o cliente da API depois de mudar a API.                               |

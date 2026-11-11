@@ -64,7 +64,7 @@ O que conta é o que está em `packages/config/vitest/coverage.mjs`: os ficheiro
 
 ### Relatório do CI
 
-O job `relatorio` deixa no PR um comentário "Relatório do CI", atualizado a cada execução. Mostra a cobertura das linhas alteradas, a cobertura global (só informativa) e as **exceções introduzidas pelo PR**. Conta como exceção, nas linhas acrescentadas:
+O job `relatorio` deixa no PR um comentário "Relatório do CI", atualizado a cada execução. Mostra a cobertura das linhas alteradas, a cobertura global dos pacotes testados neste PR (só informativa; junta unitários e integração dos pacotes que o `--affected` correu, por isso não é a cobertura do repositório) e as **exceções introduzidas pelo PR**. Conta como exceção, nas linhas acrescentadas:
 
 - um `v8 ignore`;
 - um teste desligado (`.skip(`, `.todo(`, `.fixme(`);
@@ -73,18 +73,19 @@ O job `relatorio` deixa no PR um comentário "Relatório do CI", atualizado a ca
 - uma mudança ao `app-sizes.json`;
 - uma vulnerabilidade ignorada no `auditConfig.ignoreGhsas` do `pnpm-workspace.yaml`.
 
-O relatório só avisa: cada exceção precisa da aprovação do dono, como na secção seguinte. Se o job `cobertura` falhar, o relatório sai na mesma, com "Cobertura indisponível".
+O relatório só avisa: cada exceção precisa da aprovação do dono, como na secção seguinte. Se o job `cobertura` falhar, o relatório sai na mesma: abaixo de 80% mostra a percentagem e só diz "indisponível" se o job não chegou ao fim.
 
 Hoje a lista `ignoreGhsas` está vazia. O `pnpm-workspace.yaml` tem uma substituição pontual (`js-yaml@4.2.0` passa a `4.3.2`), aprovada pelo dono: corrige a vulnerabilidade em vez de a ignorar, por isso não é uma exceção. Existe uma exceção aprovada: o teste offline do Registo Diário não corre no Firefox (limitação do Playwright; o motivo está no próprio teste, em `e2e/tests/registo.spec.ts`).
 
 ### Execução noturna
 
-O workflow `noturno.yml` corre todos os dias às 3h (UTC) sobre o `main`, e também à mão. Tem dois jobs:
+O workflow `noturno.yml` corre todos os dias às 3h (UTC) sobre o `main`, e também à mão. Tem três jobs:
 
-- `e2e-browsers`: os testes ponta a ponta em Chromium, Firefox e WebKit (mais o iPad do dia a dia). Salta-se se o `main` não mudou desde a última execução com sucesso. O Firefox só corre à noite. Localmente: `E2E_ALL_BROWSERS=1 pnpm test:e2e`, depois de `pnpm --filter @scp/e2e exec playwright install firefox webkit`.
+- `e2e-browsers`: os testes ponta a ponta em Chromium, Firefox e WebKit (mais o iPad do dia a dia). Salta-se se o `main` não mudou desde a última execução com sucesso (numa execução à mão corre sempre). O Firefox só corre à noite. Localmente: `E2E_ALL_BROWSERS=1 pnpm test:e2e`, depois de `pnpm --filter @scp/e2e exec playwright install firefox webkit`.
 - `dependencias`: `pnpm audit --audit-level high`.
+- `issue`: se algum dos anteriores falhar, abre um issue com a label `noturno` ou, se já houver um aberto, acrescenta um comentário.
 
-Se algum falhar, abre-se um issue com a label `noturno` ou, se já houver um aberto, acrescenta-se um comentário. **O GitHub desliga os workflows agendados de um repositório sem atividade durante 60 dias.** Se o repositório ficar parado, convém ver na aba Actions se o "Noturno" continua ativo e voltar a ligá-lo se não estiver.
+Os jobs `e2e-browsers` e `dependencias` só falham; é o `issue` que avisa. **O GitHub desliga os workflows agendados de um repositório sem atividade durante 60 dias.** Se o repositório ficar parado, convém ver na aba Actions se o "Noturno" continua ativo e voltar a ligá-lo se não estiver.
 
 ## Regras que não se quebram
 
