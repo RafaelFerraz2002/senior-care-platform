@@ -38,6 +38,54 @@ Resumo do [ADR-005](docs/adr/005-estrategia-testes.md) (estratégia de testes), 
 
 Nas regras de negócio e nas correções de bugs, o teste escreve-se primeiro e vê-se falhar. Os testes de integração e ponta a ponta não simulam a base de dados nem a nossa API. Os nomes dos testes são frases em português.
 
+## CI
+
+Cada PR corre os checks abaixo (`.github/workflows/`). Os nomes são estáveis: o ruleset do #24 (`main` protegido) vai torná-los obrigatórios.
+
+| Check          | O que verifica                                                                                          |
+| -------------- | ------------------------------------------------------------------------------------------------------- |
+| `lint-tipos`   | `pnpm lint` e a verificação de tipos dos pacotes afetados.                                              |
+| `unitarios`    | Testes unitários e de componentes, com cobertura.                                                       |
+| `integracao`   | Testes de integração com Postgres real, com cobertura.                                                  |
+| `seguranca`    | Testes de segurança (`pnpm test:seguranca`). Sem eles, o resumo diz "Ainda não há testes de segurança." |
+| `cobertura`    | Junta a cobertura dos três jobs acima e exige pelo menos 80% das linhas alteradas que contam.           |
+| `e2e`          | Testes ponta a ponta com Playwright (Chromium e, no Registo Diário, iPad com WebKit).                   |
+| `tamanho-apps` | Compila as apps e compara o JavaScript com o `app-sizes.json`.                                          |
+| `relatorio`    | Publica o "Relatório do CI" no PR (ver abaixo). Não falha o PR por si.                                  |
+| `titulo-pr`    | O título do PR tem de estar em Conventional Commits.                                                    |
+
+### Testes de segurança
+
+Os testes de segurança têm o sufixo `.seguranca.test.ts`. Na API ficam em `apps/api/test/` (ou `apps/api/src/`); nos outros pacotes, ao lado do código. Só o `pnpm test:seguranca` os corre: o `pnpm test` e o `pnpm test:integration` excluem-nos. O `pnpm test:all` inclui-os.
+
+### Cobertura
+
+O que conta é o que está em `packages/config/vitest/coverage.mjs`: os ficheiros `.ts` em `src/` da API, das apps e dos pacotes `shared`, `fake-data` e `ci`. Ficam de fora os `.tsx`, os testes, o código gerado, as configurações, as migrações e os pontos de entrada (`main.ts`, `*-cli.ts`). Por isso, **a lógica das apps (hooks, estado, a fila offline) vive em ficheiros `.ts`; os `.tsx` só desenham e não contam para a cobertura**. Um PR sem linhas que contem (só docs ou só `.tsx`) passa este check.
+
+### Relatório do CI
+
+O job `relatorio` deixa no PR um comentário "Relatório do CI", atualizado a cada execução. Mostra a cobertura das linhas alteradas, a cobertura global (só informativa) e as **exceções introduzidas pelo PR**. Conta como exceção, nas linhas acrescentadas:
+
+- um `v8 ignore`;
+- um teste desligado (`.skip(`, `.todo(`, `.fixme(`);
+- um `eslint-disable`;
+- um `@ts-ignore` ou `@ts-expect-error`;
+- uma mudança ao `app-sizes.json`;
+- uma vulnerabilidade ignorada no `auditConfig.ignoreGhsas` do `pnpm-workspace.yaml`.
+
+O relatório só avisa: cada exceção precisa da aprovação do dono, como na secção seguinte. Se o job `cobertura` falhar, o relatório sai na mesma, com "Cobertura indisponível".
+
+Hoje a lista `ignoreGhsas` está vazia. O `pnpm-workspace.yaml` tem uma substituição pontual (`js-yaml@4.2.0` passa a `4.3.2`), aprovada pelo dono: corrige a vulnerabilidade em vez de a ignorar, por isso não é uma exceção. Existe uma exceção aprovada: o teste offline do Registo Diário não corre no Firefox (limitação do Playwright; o motivo está no próprio teste, em `e2e/tests/registo.spec.ts`).
+
+### Execução noturna
+
+O workflow `noturno.yml` corre todos os dias às 3h (UTC) sobre o `main`, e também à mão. Tem dois jobs:
+
+- `e2e-browsers`: os testes ponta a ponta em Chromium, Firefox e WebKit (mais o iPad do dia a dia). Salta-se se o `main` não mudou desde a última execução com sucesso. O Firefox só corre à noite. Localmente: `E2E_ALL_BROWSERS=1 pnpm test:e2e`, depois de `pnpm --filter @scp/e2e exec playwright install firefox webkit`.
+- `dependencias`: `pnpm audit --audit-level high`.
+
+Se algum falhar, abre-se um issue com a label `noturno` ou, se já houver um aberto, acrescenta-se um comentário. **O GitHub desliga os workflows agendados de um repositório sem atividade durante 60 dias.** Se o repositório ficar parado, convém ver na aba Actions se o "Noturno" continua ativo e voltar a ligá-lo se não estiver.
+
 ## Regras que não se quebram
 
 - **Sem dados reais** (utentes, funcionários, saúde) no repositório, em seeds, testes ou issues. Os dados de exemplo são sempre fictícios.
@@ -54,4 +102,4 @@ O negócio em português, a técnica em inglês: se a palavra aparece nos requis
 
 ## Comandos
 
-Ver a tabela de comandos no [`README.md`](README.md). Antes de abrir o PR: `pnpm lint && pnpm typecheck && pnpm test`.
+Ver a tabela de comandos no [`README.md`](README.md). Antes de abrir o PR: `pnpm lint && pnpm typecheck && pnpm test`. O CI corre ainda a integração, a segurança, a cobertura e o e2e.

@@ -56,19 +56,20 @@ Os serviços do `docker compose` **ficam a correr** quando se pára o `pnpm dev`
 
 ## Comandos
 
-| Comando                    | O que faz                                                                              |
-| -------------------------- | -------------------------------------------------------------------------------------- |
-| `pnpm install`             | Instala as dependências e os hooks do git.                                             |
-| `pnpm dev`                 | Serviços, API e apps em modo de desenvolvimento.                                       |
-| `pnpm build`               | Compila as apps e os pacotes.                                                          |
-| `pnpm lint`                | ESLint (fronteiras entre módulos e formato dos nomes).                                 |
-| `pnpm typecheck`           | Verificação de tipos.                                                                  |
-| `pnpm test`                | Testes unitários e de componentes. Rápido e sem Docker.                                |
-| `pnpm test:integration`    | Testes de integração com Postgres real (precisa de Docker).                            |
-| `pnpm test:e2e`            | Testes ponta a ponta com Playwright (precisa dos serviços e dos browsers, ver abaixo). |
-| `pnpm test:all`            | Unitários, componentes, integração e ponta a ponta (precisa dos serviços, ver abaixo). |
-| `pnpm generate:api-client` | Regenera o `openapi.json` e o cliente da API depois de mudar a API.                    |
-| `pnpm check:size`          | Mede o JavaScript de cada app e compara com `app-sizes.json` (depois de `pnpm build`). |
+| Comando                    | O que faz                                                                                         |
+| -------------------------- | ------------------------------------------------------------------------------------------------- |
+| `pnpm install`             | Instala as dependências e os hooks do git.                                                        |
+| `pnpm dev`                 | Serviços, API e apps em modo de desenvolvimento.                                                  |
+| `pnpm build`               | Compila as apps e os pacotes.                                                                     |
+| `pnpm lint`                | ESLint (fronteiras entre módulos e formato dos nomes).                                            |
+| `pnpm typecheck`           | Verificação de tipos.                                                                             |
+| `pnpm test`                | Testes unitários e de componentes. Rápido e sem Docker.                                           |
+| `pnpm test:integration`    | Testes de integração com Postgres real (precisa de Docker).                                       |
+| `pnpm test:seguranca`      | Testes de segurança (`*.seguranca.test.ts`).                                                      |
+| `pnpm test:e2e`            | Testes ponta a ponta com Playwright (precisa dos serviços e dos browsers, ver abaixo).            |
+| `pnpm test:all`            | Unitários, componentes, integração, segurança e ponta a ponta (precisa dos serviços, ver abaixo). |
+| `pnpm generate:api-client` | Regenera o `openapi.json` e o cliente da API depois de mudar a API.                               |
+| `pnpm check:size`          | Mede o JavaScript de cada app e compara com `app-sizes.json` (depois de `pnpm build`).            |
 
 Os browsers do Playwright instalam-se uma vez:
 
