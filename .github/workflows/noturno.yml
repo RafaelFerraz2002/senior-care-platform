@@ -1,0 +1,95 @@
+# Execução noturna sobre o main (#18): e2e nos três browsers e audit das dependências.
+# Os nomes dos jobs são estáveis.
+name: Noturno
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  e2e-browsers:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Se o main não mudou desde a última execução com sucesso, o e2e salta (e conta como sucesso).
+      - name: O main mudou?
+        id: mudou
+        run: |
+          ultimo=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow noturno.yml --branch main --status success --limit 1 --json headSha --jq '.[0].headSha // ""')
+          if [ "$ultimo" = "$GITHUB_SHA" ] && [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ]; then
+            echo 'O main não mudou desde a última execução com sucesso: e2e não corrido.' >> "$GITHUB_STEP_SUMMARY"
+            echo 'correr=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'correr=true' >> "$GITHUB_OUTPUT"
+          fi
+      - uses: ./.github/actions/setup
+        if: steps.mudou.outputs.correr == 'true'
+      - run: cp .env.example .env
+        if: steps.mudou.outputs.correr == 'true'
+      - run: docker compose up -d --wait postgres
+        if: steps.mudou.outputs.correr == 'true'
+      # Imagem oficial do Playwright: já traz os browsers e as dependências do sistema, por isso não há apt
+      # (os runners não resolvem *.ubuntu.com). A versão tem de acompanhar o @playwright/test do e2e/package.json.
+      # Usa o Node e o pnpm do runner (o repositório exige o Node 26); a casa e o toolcache entram montados.
+      - name: Testes e2e na imagem do Playwright
+        if: steps.mudou.outputs.correr == 'true'
+        timeout-minutes: 10
+        run: |
+          # mcr.microsoft.com/playwright:v1.64.1-noble
+          docker run --rm --network host --ipc=host --user "$(id -u):$(id -g)" \
+            -v "$HOME:$HOME" -v /opt/hostedtoolcache:/opt/hostedtoolcache \
+            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            -e HOME="$HOME" -e CI=true -e E2E_ALL_BROWSERS=1 \
+            -e PATH="$(dirname "$(which node)"):$(dirname "$(which pnpm)"):/usr/local/bin:/usr/bin:/bin" \
+            mcr.microsoft.com/playwright@sha256:2f05f8a734509a7b3f26a912639488ee08f58a7b292d14d62271bcff9038768f \
+            pnpm test:e2e
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure()
+        with:
+          name: playwright-report
+          path: e2e/playwright-report
+          if-no-files-found: ignore
+
+  dependencias:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - run: pnpm audit --audit-level high
+
+  issue:
+    needs: [e2e-browsers, dependencias]
+    if: failure()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Abrir ou comentar o issue da falha
+        run: |
+          gh label create noturno --repo "$GITHUB_REPOSITORY" --color B60205 --description "Falha da execução noturna do CI" --force
+          corpo="Data: $(date -u +%Y-%m-%d)
+          Execução: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          existente=$(gh issue list --repo "$GITHUB_REPOSITORY" --label noturno --state open --limit 1 --json number --jq '.[0].number // ""')
+          if [ -n "$existente" ]; then
+            gh issue comment "$existente" --repo "$GITHUB_REPOSITORY" --body "$corpo"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title 'Execução noturna do CI falhou' --label noturno --body "$corpo"
+          fi

@@ -16,13 +16,15 @@
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "vitest run --exclude '**/*.seguranca.test.ts'",
+    "test:seguranca": "vitest run seguranca.test --passWithNoTests --coverage.reportsDirectory=coverage/seguranca"
   },
   "dependencies": {
     "@faker-js/faker": "10.6.0"
   },
   "devDependencies": {
     "@scp/config": "workspace:*",
+    "@vitest/coverage-v8": "5.1.0",
     "typescript": "~6.0.3",
     "vitest": "5.1.0"
   }

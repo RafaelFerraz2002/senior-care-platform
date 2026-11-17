@@ -52,6 +52,6 @@ Plataforma SaaS multi-organização para gestão de respostas sociais para idoso
 
 - `pnpm install`; `pnpm dev` (sobe o `docker compose`, a API e as apps; os serviços ficam a correr).
 - `pnpm lint`, `pnpm typecheck`, `pnpm test` (unitários e componentes, sem Docker).
-- `pnpm test:integration` (Docker); `pnpm test:e2e` (`docker compose up -d` antes e browsers do Playwright); `pnpm test:all` (todos).
+- `pnpm test:integration` (Docker); `pnpm test:seguranca` (os `*.seguranca.test.ts`); `pnpm test:e2e` (`docker compose up -d` antes e browsers do Playwright); `pnpm test:all` (todos).
 - `pnpm generate:api-client`: regenera o `openapi.json` e o cliente depois de mudar a API.
 - `pnpm check:size` (depois de `pnpm build`): compara o JavaScript das apps com `app-sizes.json`.

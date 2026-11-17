@@ -32,6 +32,19 @@
         "TESTCONTAINERS_*"
       ]
     },
+    "test:seguranca": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "passThroughEnv": [
+        "API_PORT",
+        "DATABASE_URL",
+        "DOCKER_*",
+        "E2E_API_PORT",
+        "LOG_LEVEL",
+        "PLAYWRIGHT_*",
+        "TESTCONTAINERS_*"
+      ]
+    },
     "test:e2e": {
       "dependsOn": ["^build"],
       "cache": false,
@@ -39,6 +52,7 @@
         "API_PORT",
         "DATABASE_URL",
         "DOCKER_*",
+        "E2E_ALL_BROWSERS",
         "E2E_API_PORT",
         "LOG_LEVEL",
         "PLAYWRIGHT_*",

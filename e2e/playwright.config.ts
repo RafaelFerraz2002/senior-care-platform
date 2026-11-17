@@ -14,6 +14,8 @@ if (existsSync(`${root}.env`)) process.loadEnvFile(`${root}.env`);
 const apiPort = process.env.E2E_API_PORT ?? '3100';
 const env = { API_PORT: apiPort };
 const reuseExistingServer = !process.env.CI;
+// Com E2E_ALL_BROWSERS=1 (noturno) acrescentam-se o Firefox e o Safari de desktop.
+const todosBrowsers = process.env.E2E_ALL_BROWSERS === '1';
 
 export default defineConfig({
   testDir: './tests',
@@ -28,6 +30,12 @@ export default defineConfig({
       use: { ...devices['iPad (gen 7)'] },
       testMatch: /registo\.spec\.ts/,
     },
+    ...(todosBrowsers
+      ? [
+          { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+          { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+        ]
+      : []),
   ],
   webServer: [
     {

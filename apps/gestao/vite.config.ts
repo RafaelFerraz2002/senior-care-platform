@@ -1,3 +1,4 @@
+import { coverage } from '@scp/config/vitest/coverage';
 import tailwindcss from '@tailwindcss/vite';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import react from '@vitejs/plugin-react';
@@ -13,6 +14,7 @@ export default defineConfig({
   server: { port: 5173, strictPort: true, proxy },
   preview: { port: 5173, strictPort: true, proxy },
   test: {
+    coverage: coverage('unit'),
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
   },
