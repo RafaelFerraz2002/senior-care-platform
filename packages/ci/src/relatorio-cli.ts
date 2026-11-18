@@ -42,3 +42,6 @@ const texto = buildRelatorio({
 });
 mkdirSync(dirname(values.saida), { recursive: true });
 writeFileSync(values.saida, texto);
+
+// Prova temporária do #24: erro de tipos de propósito (revertido a seguir).
+export const provaTipos: number = 'não é um número';
