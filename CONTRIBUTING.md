@@ -74,7 +74,7 @@ O job `relatorio` deixa no PR um comentário "Relatório do CI", atualizado a ca
 - um `@ts-ignore` ou `@ts-expect-error`;
 - uma mudança ao `app-sizes.json`;
 - uma vulnerabilidade ignorada no `auditConfig.ignoreGhsas` do `pnpm-workspace.yaml`;
-- um segredo marcado como falso alarme: uma linha com `gitleaks:allow`, uma linha no `.gitleaksignore` ou uma mudança ao `.gitleaks.toml`.
+- um segredo marcado como falso alarme: uma linha no `.gitleaksignore`, uma mudança ao `.gitleaks.toml` ou um comentário `gitleaks:allow`. O CI ignora estes comentários (`--ignore-gitleaks-allow`): um falso alarme só se declara no `.gitleaksignore`, que fica no diff.
 
 O relatório só avisa: cada exceção precisa da aprovação do dono, como na secção seguinte. Se o job `cobertura` falhar, o relatório sai na mesma: abaixo de 80% mostra a percentagem e só diz "indisponível" se o job não chegou ao fim.
 
@@ -86,7 +86,7 @@ O workflow `noturno.yml` corre todos os dias às 3h (UTC) sobre o `main`, e tamb
 
 - `e2e-browsers`: os testes ponta a ponta em Chromium, Firefox e WebKit (mais o iPad do dia a dia). Salta-se se o `main` não mudou desde a última execução com sucesso (numa execução à mão corre sempre). O Firefox só corre à noite. Localmente: `E2E_ALL_BROWSERS=1 pnpm test:e2e`, depois de `pnpm --filter @scp/e2e exec playwright install firefox webkit` (no CI corre na imagem oficial do Playwright).
 - `dependencias`: `pnpm audit --audit-level high`.
-- `segredos`: o gitleaks varre o histórico inteiro, porque as regras dele mudam e podem apanhar commits antigos.
+- `segredos`: o gitleaks varre o histórico inteiro do `main`, porque as regras dele mudam e podem apanhar commits antigos.
 - `issue`: se algum dos anteriores falhar, abre um issue com a label `noturno` ou, se já houver um aberto, acrescenta um comentário.
 
 Os jobs `e2e-browsers`, `dependencias` e `segredos` só falham; é o `issue` que avisa. **O GitHub desliga os workflows agendados de um repositório sem atividade durante 60 dias.** Se o repositório ficar parado, convém ver na aba Actions se o "Noturno" continua ativo e voltar a ligá-lo se não estiver.
@@ -115,7 +115,7 @@ gh api -X PUT "repos/RafaelFerraz2002/senior-care-platform/rulesets/$id" --input
 ## Regras que não se quebram
 
 - **Sem dados reais** (utentes, funcionários, saúde) no repositório, em seeds, testes ou issues. Os dados de exemplo são sempre fictícios.
-- **Sem segredos** em ficheiros versionados. Só em variáveis de ambiente (`.env` está no `.gitignore`; só o `.env.example` é versionado).
+- **Sem segredos** em ficheiros versionados. Só em variáveis de ambiente (`.env` está no `.gitignore`; só o `.env.example` é versionado). Um segredo que chegou ao GitHub, mesmo num commit intermédio de um PR, considera-se exposto: revoga-se e troca-se. Apagar o commit não chega, porque o GitHub continua a guardá-lo.
 - Qualquer funcionalidade que guarde, mostre ou exporte dados pessoais segue o [ADR-006](docs/adr/006-rgpd-seguranca.md) (proteção de dados, RGPD e segurança).
 
 ## Exceções a checks

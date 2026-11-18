@@ -69,10 +69,11 @@ _Rejeitado:_ commits assinados e merge queue, que dão trabalho sem ganho para u
 ### 5. gitleaks
 
 - **Em cada PR**, um job `segredos` no `ci.yml` varre todos os commits do PR (`origin/main..HEAD`). Os commits intermédios ficam públicos no branch mesmo depois do squash, por isso não basta varrer o resultado final.
-- **Na execução noturna**, um job `segredos` no `noturno.yml` varre o histórico inteiro. As regras do gitleaks vão mudando e podem apanhar coisas antigas. Se falhar, abre o issue `noturno` como os outros jobs.
+- **Na execução noturna**, um job `segredos` no `noturno.yml` varre o histórico inteiro do `main` (`--log-opts="HEAD"`; os branches dos PRs já são varridos no CI deles). As regras do gitleaks vão mudando e podem apanhar coisas antigas. Se falhar, abre o issue `noturno` como os outros jobs.
 - **Imagem:** a imagem oficial `ghcr.io/gitleaks/gitleaks:v8.30.1`, fixada pela impressão digital (`sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f`), como a do Playwright.
 - **Regras:** as de origem, sem configuração própria.
 - **Saída:** `--redact`, porque os registos do CI são públicos e um segredo encontrado não pode ir parar lá.
+- **Comentários `gitleaks:allow` ignorados** (`--ignore-gitleaks-allow`): o gitleaks respeita-os commit a commit, por isso um comentário num commit intermédio, apagado depois, esconderia um segredo que fica público no branch sem aparecer no relatório. Um falso alarme só se declara no `.gitleaksignore` (decisão do revisor final, dentro do espírito da decisão 6).
 - **Ponto de partida:** o histórico atual (78 commits) foi varrido a 2026-11-18 e não tem segredos.
 
 _Rejeitado:_ a ação oficial do gitleaks, que é um intermediário a mais; um hook local antes de cada commit, que obriga a instalar o gitleaks em cada máquina (a proteção de push do GitHub já trava os segredos conhecidos).
@@ -87,7 +88,7 @@ Marcar um segredo como falso alarme é uma exceção a um check. Só acontece co
 
 ### 7. Template de PR
 
-O ficheiro `.github/pull_request_template.md` tem exatamente o conteúdo da secção 3 do ADR-004, sem comentários HTML.
+O ficheiro `.github/pull_request_template.md` tem o conteúdo da secção 3 do ADR-004, sem comentários HTML. O Prettier normaliza as linhas em branco (uma depois de "O que muda", uma depois de "Pronto?"); o resultado no GitHub é o mesmo e o ADR não se reescreve.
 
 ### 8. CodeRabbit
 
@@ -100,6 +101,10 @@ O ficheiro `.github/pull_request_template.md` tem exatamente o conteúdo da sec�
   - lê como regras o `CLAUDE.md`, que lê por defeito, o `CONTRIBUTING.md` e os ADRs;
   - instruções por caminho com as regras que mais custam se falharem: `organizacao_id` e RLS em todas as tabelas de organização, acesso só por `withOrganizacao`, a organização nunca vem do cliente, logs sem dados pessoais (ADR-006), sem dados reais nem segredos, e a convenção de nomes.
 - **Não é um check obrigatório:** se o serviço falhar ou atingir o limite, bloquearia todos os PRs. As conversas que abre têm de ser resolvidas, como as do `/code-review`.
+
+### 8a. Sem `workflow_dispatch` no CI dos PRs
+
+O `ci.yml` deixa de ter `workflow_dispatch`: uma execução à mão num branch publicaria checks com os mesmos nomes no commit, testados sem o merge com o `main`, e podia pôr verde um check obrigatório. Para repetir um check usa-se "Re-run jobs".
 
 ### 9. Ordem e provas
 

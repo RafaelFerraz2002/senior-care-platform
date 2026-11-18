@@ -127,10 +127,11 @@ describe('findExcecoes', () => {
     expect(findExcecoes(diff)).toEqual([]);
   });
 
-  it('marca cada linha acrescentada ao .gitleaksignore', () => {
-    const diff = diffDe('.gitleaksignore', '@@ -0,0 +1,2 @@', [
+  it('marca cada linha acrescentada ao .gitleaksignore, sem contar as vazias', () => {
+    const diff = diffDe('.gitleaksignore', '@@ -0,0 +1,3 @@', [
       '+abc123:apps/api/src/x.ts:generic-api-key:4',
       '+def456:e2e/y.ts:generic-api-key:9',
+      '+',
     ]);
     expect(findExcecoes(diff)).toEqual([
       {

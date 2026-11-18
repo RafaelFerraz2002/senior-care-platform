@@ -45,7 +45,7 @@ const PADROES_CODIGO: { tipo: TipoExcecao; padrao: RegExp }[] = [
 ];
 
 function segredoIgnorado(ficheiro: string, texto: string): boolean {
-  if (ficheiro === '.gitleaksignore') return true;
+  if (ficheiro === '.gitleaksignore') return texto !== '';
   if (!GITLEAKS_ALLOW.test(texto)) return false;
   return !(ficheiro.endsWith('.md') && GITLEAKS_ALLOW_CITADO.test(texto));
 }

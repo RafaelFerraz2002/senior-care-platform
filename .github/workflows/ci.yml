@@ -4,7 +4,6 @@ name: CI
 on:
   pull_request:
     branches: [main]
-  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -212,13 +211,15 @@ jobs:
           persist-credentials: false
       # Todos os commits do PR, não só o resultado: os intermédios ficam públicos no branch mesmo depois do squash.
       # Imagem oficial do gitleaks, fixada pelo digest. --redact: os registos do CI são públicos.
+      # --ignore-gitleaks-allow: um falso alarme só se declara no .gitleaksignore, que aparece no diff
+      # e no relatório; um comentário num commit intermédio apagado depois não apareceria.
       - name: gitleaks
         run: |
           # ghcr.io/gitleaks/gitleaks:v8.30.1
           docker run --rm --user "$(id -u):$(id -g)" \
             -v "$GITHUB_WORKSPACE:/repo" -w /repo \
             ghcr.io/gitleaks/gitleaks@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f \
-            git --redact --no-banner -v --log-opts="origin/main..HEAD" .
+            git --redact --ignore-gitleaks-allow --no-banner -v --log-opts="origin/main..HEAD" .
 
   relatorio:
     runs-on: ubuntu-24.04
