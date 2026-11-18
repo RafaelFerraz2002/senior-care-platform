@@ -14,6 +14,7 @@ const NOMES_TIPOS: Record<TipoExcecao, string> = {
   'ts-ignore': '`@ts-ignore` / `@ts-expect-error`',
   'tamanho-apps': 'Valor de referência em `app-sizes.json`',
   'audit-ignorada': 'Vulnerabilidade ignorada no audit',
+  'segredo-ignorado': 'Segredo marcado como falso alarme (gitleaks)',
 };
 
 function formatPercentagem(valor: number): string {

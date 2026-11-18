@@ -126,10 +126,10 @@ O processo completo depende de peças que ainda não existem. Até lá:
 
 | Peça | Até existir | Quando passa a valer |
 |---|---|---|
-| CI (status checks) | Há checks com nome em cada PR (#18); passam a obrigatórios no ruleset do #24. | [#24](https://github.com/RafaelFerraz2002/senior-care-platform/issues/24): os jobs do CI passam a obrigatórios no ruleset. |
-| Ruleset do `main` | As regras valem por disciplina: não há push direto para o `main` nem merge sem review. | [#24](https://github.com/RafaelFerraz2002/senior-care-platform/issues/24) |
-| CodeRabbit | O review é só o `/code-review`. | [#24](https://github.com/RafaelFerraz2002/senior-care-platform/issues/24) |
-| Template de PR | O conteúdo da secção 3 copia-se à mão para cada PR. | [#24](https://github.com/RafaelFerraz2002/senior-care-platform/issues/24) |
+| CI (status checks) | Há checks com nome em cada PR (#18). | Em vigor desde o [#24](https://github.com/RafaelFerraz2002/senior-care-platform/issues/24): obrigatórios no ruleset (`.github/rulesets/main.json`), com o `gitleaks` no job `segredos`. |
+| Ruleset do `main` | As regras valem por disciplina: não há push direto para o `main` nem merge sem review. | Em vigor desde o [#24](https://github.com/RafaelFerraz2002/senior-care-platform/issues/24). |
+| CodeRabbit | O review é só o `/code-review`. | Em vigor desde o [#24](https://github.com/RafaelFerraz2002/senior-care-platform/issues/24) (`.coderabbit.yaml`). |
+| Template de PR | O conteúdo da secção 3 copia-se à mão para cada PR. | Em vigor desde o [#24](https://github.com/RafaelFerraz2002/senior-care-platform/issues/24) (`.github/pull_request_template.md`). |
 | Testes na definição de pronto | "n/a" enquanto não houver código. | [#17](https://github.com/RafaelFerraz2002/senior-care-platform/issues/17) (scaffolding) e ADR-005 ([#22](https://github.com/RafaelFerraz2002/senior-care-platform/issues/22)) |
 
 ## Consequências

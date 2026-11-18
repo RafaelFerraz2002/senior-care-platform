@@ -4,7 +4,8 @@ export type TipoExcecao =
   | 'eslint-disable'
   | 'ts-ignore'
   | 'tamanho-apps'
-  | 'audit-ignorada';
+  | 'audit-ignorada'
+  | 'segredo-ignorado';
 
 export interface Excecao {
   tipo: TipoExcecao;
@@ -24,6 +25,17 @@ const FICHEIROS_IGNORADOS = [
 // Só entradas de lista com o id de um aviso (`- GHSA-…`), nunca comentários.
 const ENTRADA_AVISO = /^-\s+['"]?(GHSA-|CVE-)/;
 
+// Ficheiros em que qualquer mudança é uma exceção, contada uma só vez (na primeira linha acrescentada).
+// Um Map e não um objeto: um ficheiro chamado `constructor` não pode dar um tipo herdado do protótipo.
+const UMA_VEZ_POR_FICHEIRO = new Map<string, TipoExcecao>([
+  ['app-sizes.json', 'tamanho-apps'],
+  ['.gitleaks.toml', 'segredo-ignorado'],
+]);
+
+// Um `gitleaks:allow` citado entre acentos graves num .md é documentação, não uma exceção.
+const GITLEAKS_ALLOW = /gitleaks:allow/;
+const GITLEAKS_ALLOW_CITADO = /`gitleaks:allow`/;
+
 const EXTENSOES_CODIGO = /\.(ts|tsx|mts|cts|js|mjs|cjs)$/;
 
 const PADROES_CODIGO: { tipo: TipoExcecao; padrao: RegExp }[] = [
@@ -33,17 +45,28 @@ const PADROES_CODIGO: { tipo: TipoExcecao; padrao: RegExp }[] = [
   { tipo: 'ts-ignore', padrao: /@ts-ignore|@ts-expect-error/ },
 ];
 
+function segredoIgnorado(ficheiro: string, texto: string): boolean {
+  if (ficheiro === '.gitleaksignore') return texto !== '';
+  if (!GITLEAKS_ALLOW.test(texto)) return false;
+  return !(ficheiro.endsWith('.md') && GITLEAKS_ALLOW_CITADO.test(texto));
+}
+
 function tiposDaLinha(ficheiro: string, texto: string): TipoExcecao[] {
+  const tipos: TipoExcecao[] = [];
   if (EXTENSOES_CODIGO.test(ficheiro)) {
-    return PADROES_CODIGO.filter(({ padrao }) => padrao.test(texto)).map(({ tipo }) => tipo);
+    tipos.push(
+      ...PADROES_CODIGO.filter(({ padrao }) => padrao.test(texto)).map(({ tipo }) => tipo),
+    );
   }
-  if (ficheiro === 'pnpm-workspace.yaml' && ENTRADA_AVISO.test(texto)) return ['audit-ignorada'];
-  return [];
+  if (ficheiro === 'pnpm-workspace.yaml' && ENTRADA_AVISO.test(texto)) tipos.push('audit-ignorada');
+  if (segredoIgnorado(ficheiro, texto)) tipos.push('segredo-ignorado');
+  return tipos;
 }
 
 function excecoesDaLinha(ficheiro: string, linha: number, texto: string): Excecao[] {
   if (FICHEIROS_IGNORADOS.includes(ficheiro)) return [];
-  if (ficheiro === 'app-sizes.json') return [{ tipo: 'tamanho-apps', ficheiro, linha, texto }];
+  const tipoDoFicheiro = UMA_VEZ_POR_FICHEIRO.get(ficheiro);
+  if (tipoDoFicheiro !== undefined) return [{ tipo: tipoDoFicheiro, ficheiro, linha, texto }];
   return tiposDaLinha(ficheiro, texto).map((tipo) => ({ tipo, ficheiro, linha, texto }));
 }
 
@@ -52,27 +75,35 @@ function ficheiroNovo(cabecalho: string): string | null {
   return destino === '/dev/null' ? null : destino.replace(/^b\//, '');
 }
 
+/** Exceções de uma linha acrescentada, contando só uma vez os ficheiros de UMA_VEZ_POR_FICHEIRO. */
+function excecoesAcrescentada(
+  ficheiro: string,
+  linha: number,
+  texto: string,
+  jaMarcado: boolean,
+): Excecao[] {
+  const umaVez = UMA_VEZ_POR_FICHEIRO.has(ficheiro);
+  return umaVez && jaMarcado ? [] : excecoesDaLinha(ficheiro, linha, texto);
+}
+
 /** Deteta as exceções aos checks nas linhas acrescentadas de um `git diff --unified=0`. */
 export function findExcecoes(diff: string): Excecao[] {
   const excecoes: Excecao[] = [];
   let ficheiro: string | null = null;
   let linha = 0;
-  let tamanhoMarcado = false;
+  let marcados = 0;
 
   for (const bruta of diff.split('\n')) {
     if (bruta.startsWith('diff --git ')) {
       ficheiro = null;
-      tamanhoMarcado = false;
+      marcados = 0;
     } else if (bruta.startsWith('+++ ')) {
       ficheiro = ficheiroNovo(bruta);
     } else if (bruta.startsWith('@@')) {
       linha = Number(/\+(\d+)/.exec(bruta)?.[1] ?? 0);
     } else if (bruta.startsWith('+') && ficheiro !== null) {
-      // app-sizes.json: uma só exceção por ficheiro, na primeira linha acrescentada.
-      const novas = excecoesDaLinha(ficheiro, linha, bruta.slice(1).trim()).filter(
-        (e) => e.tipo !== 'tamanho-apps' || !tamanhoMarcado,
-      );
-      tamanhoMarcado ||= novas.some((e) => e.tipo === 'tamanho-apps');
+      const novas = excecoesAcrescentada(ficheiro, linha, bruta.slice(1).trim(), marcados > 0);
+      marcados += novas.length;
       excecoes.push(...novas);
       linha += 1;
     }

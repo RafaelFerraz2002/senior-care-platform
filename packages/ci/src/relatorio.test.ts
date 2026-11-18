@@ -73,6 +73,7 @@ As exceções só entram com autorização do dono, dada pelo merge (ADR-005).
       'ts-ignore',
       'tamanho-apps',
       'audit-ignorada',
+      'segredo-ignorado',
     ] as const;
     const texto = buildRelatorio({
       alteradas: null,
@@ -86,5 +87,6 @@ As exceções só entram com autorização do dono, dada pelo merge (ADR-005).
     expect(texto).toContain('`@ts-ignore` / `@ts-expect-error`');
     expect(texto).toContain('Valor de referência em `app-sizes.json`');
     expect(texto).toContain('Vulnerabilidade ignorada no audit');
+    expect(texto).toContain('Segredo marcado como falso alarme (gitleaks)');
   });
 });
