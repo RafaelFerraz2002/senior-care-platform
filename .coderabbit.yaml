@@ -9,6 +9,9 @@ reviews:
   auto_approvals:
     enabled: false
   poem: false
+  # O resumo vai para o comentário do CodeRabbit, não para a descrição: com o squash, a descrição
+  # inteira passa a mensagem do commit no main (ADR-004), e o resumo traz comentários HTML.
+  high_level_summary_in_walkthrough: true
   in_progress_fortune: false
   # Ficheiros gerados ou escritos por ferramentas: nunca se editam à mão.
   path_filters:
