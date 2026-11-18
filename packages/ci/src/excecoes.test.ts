@@ -160,6 +160,14 @@ describe('findExcecoes', () => {
     ]);
   });
 
+  it('não confunde um ficheiro chamado constructor com um tipo de exceção', () => {
+    const diff = [
+      diffDe('constructor', '@@ -0,0 +1,1 @@', ['+qualquer coisa']),
+      diffDe('toString', '@@ -0,0 +1,1 @@', ['+outra coisa']),
+    ].join('\n');
+    expect(findExcecoes(diff)).toEqual([]);
+  });
+
   it('não marca os ficheiros do relatório, que citam os padrões de propósito', () => {
     const diff = [
       diffDe('packages/ci/src/relatorio.ts', '@@ -0,0 +1,1 @@', ['+// eslint-disable']),

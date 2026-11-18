@@ -26,10 +26,11 @@ const FICHEIROS_IGNORADOS = [
 const ENTRADA_AVISO = /^-\s+['"]?(GHSA-|CVE-)/;
 
 // Ficheiros em que qualquer mudança é uma exceção, contada uma só vez (na primeira linha acrescentada).
-const UMA_VEZ_POR_FICHEIRO: Record<string, TipoExcecao> = {
-  'app-sizes.json': 'tamanho-apps',
-  '.gitleaks.toml': 'segredo-ignorado',
-};
+// Um Map e não um objeto: um ficheiro chamado `constructor` não pode dar um tipo herdado do protótipo.
+const UMA_VEZ_POR_FICHEIRO = new Map<string, TipoExcecao>([
+  ['app-sizes.json', 'tamanho-apps'],
+  ['.gitleaks.toml', 'segredo-ignorado'],
+]);
 
 // Um `gitleaks:allow` citado entre acentos graves num .md é documentação, não uma exceção.
 const GITLEAKS_ALLOW = /gitleaks:allow/;
@@ -64,7 +65,7 @@ function tiposDaLinha(ficheiro: string, texto: string): TipoExcecao[] {
 
 function excecoesDaLinha(ficheiro: string, linha: number, texto: string): Excecao[] {
   if (FICHEIROS_IGNORADOS.includes(ficheiro)) return [];
-  const tipoDoFicheiro = UMA_VEZ_POR_FICHEIRO[ficheiro];
+  const tipoDoFicheiro = UMA_VEZ_POR_FICHEIRO.get(ficheiro);
   if (tipoDoFicheiro !== undefined) return [{ tipo: tipoDoFicheiro, ficheiro, linha, texto }];
   return tiposDaLinha(ficheiro, texto).map((tipo) => ({ tipo, ficheiro, linha, texto }));
 }
@@ -81,7 +82,7 @@ function excecoesAcrescentada(
   texto: string,
   jaMarcado: boolean,
 ): Excecao[] {
-  const umaVez = ficheiro in UMA_VEZ_POR_FICHEIRO;
+  const umaVez = UMA_VEZ_POR_FICHEIRO.has(ficheiro);
   return umaVez && jaMarcado ? [] : excecoesDaLinha(ficheiro, linha, texto);
 }
 
