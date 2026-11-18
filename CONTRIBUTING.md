@@ -7,8 +7,9 @@ Todo o trabalho segue o processo do [ADR-004](docs/adr/004-processo-desenvolvime
 1. **Todo o trabalho nasce de um issue.** Se não houver, cria-se antes de começar.
 2. **Branch** `tipo/#nr-descricao` a partir de `main` atualizado, por exemplo `feat/#42-registo-atividade`.
 3. **Commits** em [Conventional Commits](https://www.conventionalcommits.org/) (`feat(registo): …`, `fix(api): …`, `docs(adr): …`). Os hooks (lefthook) formatam e verificam ao fazer commit; não se contornam.
-4. **PR para `main`** com o título em Conventional Commits e `Closes #nr` na descrição. A descrição segue o template do ADR-004: "O que muda", a checklist "Pronto?" e `Closes #nr`.
-5. **Squash merge**, feito pelo dono do repositório. Nunca há push direto para `main`.
+4. **PR para `main`** com o título em Conventional Commits e `Closes #nr` na descrição. A descrição vem do template (`.github/pull_request_template.md`): "O que muda", a checklist "Pronto?" e `Closes #nr`.
+5. **Review:** o `/code-review` do Claude Code e o CodeRabbit comentam no PR. Cada conversa é corrigida, ou respondida com a justificação, e marcada como resolvida.
+6. **Squash merge**, feito pelo dono do repositório. O GitHub recusa o push direto para `main` (ver [Regras do `main`](#regras-do-main)).
 
 ## Definição de pronto
 
@@ -40,7 +41,7 @@ Nas regras de negócio e nas correções de bugs, o teste escreve-se primeiro e 
 
 ## CI
 
-Cada PR corre os checks abaixo (`.github/workflows/`). Os nomes são estáveis: o ruleset do #24 (`main` protegido) vai torná-los obrigatórios.
+Cada PR corre os checks abaixo (`.github/workflows/`). Todos, menos o `relatorio`, são obrigatórios para o merge (ver [Regras do `main`](#regras-do-main)). Os nomes são estáveis: o ruleset refere-os.
 
 | Check          | O que verifica                                                                                          |
 | -------------- | ------------------------------------------------------------------------------------------------------- |
@@ -53,6 +54,7 @@ Cada PR corre os checks abaixo (`.github/workflows/`). Os nomes são estáveis: 
 | `tamanho-apps` | Compila as apps e compara o JavaScript com o `app-sizes.json`.                                          |
 | `relatorio`    | Publica o "Relatório do CI" no PR (ver abaixo). Não falha o PR por si.                                  |
 | `titulo-pr`    | O título do PR tem de estar em Conventional Commits.                                                    |
+| `segredos`     | O gitleaks varre todos os commits do PR à procura de segredos (chaves, tokens, passwords).              |
 
 ### Testes de segurança
 
@@ -71,7 +73,8 @@ O job `relatorio` deixa no PR um comentário "Relatório do CI", atualizado a ca
 - um `eslint-disable`;
 - um `@ts-ignore` ou `@ts-expect-error`;
 - uma mudança ao `app-sizes.json`;
-- uma vulnerabilidade ignorada no `auditConfig.ignoreGhsas` do `pnpm-workspace.yaml`.
+- uma vulnerabilidade ignorada no `auditConfig.ignoreGhsas` do `pnpm-workspace.yaml`;
+- um segredo marcado como falso alarme: uma linha com `gitleaks:allow`, uma linha no `.gitleaksignore` ou uma mudança ao `.gitleaks.toml`.
 
 O relatório só avisa: cada exceção precisa da aprovação do dono, como na secção seguinte. Se o job `cobertura` falhar, o relatório sai na mesma: abaixo de 80% mostra a percentagem e só diz "indisponível" se o job não chegou ao fim.
 
@@ -79,13 +82,35 @@ Hoje a lista `ignoreGhsas` está vazia. O `pnpm-workspace.yaml` tem uma substitu
 
 ### Execução noturna
 
-O workflow `noturno.yml` corre todos os dias às 3h (UTC) sobre o `main`, e também à mão. Tem três jobs:
+O workflow `noturno.yml` corre todos os dias às 3h (UTC) sobre o `main`, e também à mão. Tem quatro jobs:
 
 - `e2e-browsers`: os testes ponta a ponta em Chromium, Firefox e WebKit (mais o iPad do dia a dia). Salta-se se o `main` não mudou desde a última execução com sucesso (numa execução à mão corre sempre). O Firefox só corre à noite. Localmente: `E2E_ALL_BROWSERS=1 pnpm test:e2e`, depois de `pnpm --filter @scp/e2e exec playwright install firefox webkit` (no CI corre na imagem oficial do Playwright).
 - `dependencias`: `pnpm audit --audit-level high`.
+- `segredos`: o gitleaks varre o histórico inteiro, porque as regras dele mudam e podem apanhar commits antigos.
 - `issue`: se algum dos anteriores falhar, abre um issue com a label `noturno` ou, se já houver um aberto, acrescenta um comentário.
 
-Os jobs `e2e-browsers` e `dependencias` só falham; é o `issue` que avisa. **O GitHub desliga os workflows agendados de um repositório sem atividade durante 60 dias.** Se o repositório ficar parado, convém ver na aba Actions se o "Noturno" continua ativo e voltar a ligá-lo se não estiver.
+Os jobs `e2e-browsers`, `dependencias` e `segredos` só falham; é o `issue` que avisa. **O GitHub desliga os workflows agendados de um repositório sem atividade durante 60 dias.** Se o repositório ficar parado, convém ver na aba Actions se o "Noturno" continua ativo e voltar a ligá-lo se não estiver.
+
+### Regras do `main`
+
+O ruleset do `main` está em `.github/rulesets/main.json` e aplica as regras do ADR-004:
+
+- só se entra por PR, sem aprovação obrigatória (o merge do dono vale como aprovação);
+- os checks do CI têm de estar verdes, exceto o `relatorio`, e só contam se vierem do GitHub Actions;
+- o branch tem de estar atualizado com o `main`: se outro PR entrou primeiro, carrega-se em "Update branch" e o CI corre de novo;
+- todas as conversas do review resolvidas;
+- só squash merge; sem force push nem eliminação do `main`.
+
+O admin pode passar por cima das regras (bypass), mas só num PR: o push direto continua recusado. Usa-se só em emergência, por exemplo com o CI em baixo por uma falha externa, e com a justificação escrita no PR. Cada bypass fica registado no GitHub.
+
+O CodeRabbit (`.coderabbit.yaml`) não é um check obrigatório: só comenta.
+
+Uma mudança às regras faz-se no ficheiro, por PR, e depois aplica-se:
+
+```sh
+id=$(gh api repos/RafaelFerraz2002/senior-care-platform/rulesets --jq '.[] | select(.name == "main") | .id')
+gh api -X PUT "repos/RafaelFerraz2002/senior-care-platform/rulesets/$id" --input .github/rulesets/main.json
+```
 
 ## Regras que não se quebram
 
@@ -95,7 +120,7 @@ Os jobs `e2e-browsers` e `dependencias` só falham; é o `issue` que avisa. **O 
 
 ## Exceções a checks
 
-Nunca se cria uma exceção a um check por iniciativa própria: subir um valor de referência (como o de `app-sizes.json`), acrescentar um `v8 ignore` ou pôr um teste em quarentena. Pergunta-se primeiro ao dono, com o motivo. Os testes de segurança e RGPD não têm exceção.
+Nunca se cria uma exceção a um check por iniciativa própria: subir um valor de referência (como o de `app-sizes.json`), acrescentar um `v8 ignore`, marcar um segredo como falso alarme ou pôr um teste em quarentena. Pergunta-se primeiro ao dono, com o motivo. Os testes de segurança e RGPD não têm exceção.
 
 ## Convenção de nomes
 
@@ -103,4 +128,4 @@ O negócio em português, a técnica em inglês: se a palavra aparece nos requis
 
 ## Comandos
 
-Ver a tabela de comandos no [`README.md`](README.md). Antes de abrir o PR: `pnpm lint && pnpm typecheck && pnpm test`. O CI corre ainda a integração, a segurança, a cobertura e o e2e.
+Ver a tabela de comandos no [`README.md`](README.md). Antes de abrir o PR: `pnpm lint && pnpm typecheck && pnpm test`. O CI corre ainda a integração, a segurança, a cobertura, o e2e e o gitleaks.
