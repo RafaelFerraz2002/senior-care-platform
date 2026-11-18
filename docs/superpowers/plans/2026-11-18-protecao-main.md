@@ -34,7 +34,7 @@
 **Ficheiros:** `packages/ci/src/excecoes.ts`, `packages/ci/src/excecoes.test.ts`, `packages/ci/src/relatorio.ts`, `packages/ci/src/relatorio.test.ts`.
 
 - [ ] Testes novos em `excecoes.test.ts` (devem falhar antes do código):
-  - `'marca um gitleaks:allow em qualquer ficheiro'`: diff de `config/x.yml` com `+token: abc # gitleaks:allow` dá `[{ tipo: 'segredo-ignorado', ficheiro: 'config/x.yml', linha, texto }]`; o mesmo num `.ts`.
+  - Teste do comentário de falso alarme em qualquer ficheiro: um diff de `config/x.yml` com o comentário de falso alarme do gitleaks numa linha dá uma exceção `segredo-ignorado` com o ficheiro, a linha e o texto; o mesmo num `.ts`.
   - `'marca cada linha acrescentada ao .gitleaksignore'`: duas linhas dão duas exceções `segredo-ignorado`, com as linhas certas.
   - `'marca uma só vez a mudança ao .gitleaks.toml'`: três linhas acrescentadas dão uma exceção, na primeira.
 - [ ] `relatorio.test.ts`: a lista de tipos com nome passa a incluir `'segredo-ignorado'`.
