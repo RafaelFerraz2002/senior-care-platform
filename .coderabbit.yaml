@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# Review automático dos PRs (ADR-004, processo de desenvolvimento). Não é um check obrigatório:
+# só comenta, e as conversas que abre têm de ser resolvidas antes do merge.
+language: pt-PT
+
+reviews:
+  profile: chill
+  # O merge do dono é a aprovação (ADR-004): o CodeRabbit nunca aprova.
+  auto_approvals:
+    enabled: false
+  poem: false
+  in_progress_fortune: false
+  # Ficheiros gerados ou escritos por ferramentas: nunca se editam à mão.
+  path_filters:
+    - '!pnpm-lock.yaml'
+    - '!apps/api/openapi.json'
+    - '!packages/api-client/src/**'
+    - '!**/*.gen.ts'
+  path_instructions:
+    - path: '**/*'
+      instructions: |
+        O repositório é público. Assinala qualquer dado real (nomes, NIF, números de utente, moradas,
+        dados de saúde) ou segredo (passwords, chaves, tokens): os dados de exemplo são sempre fictícios
+        e os segredos vivem só em variáveis de ambiente.
+        Nomes no código: o negócio em português sem acentos, a técnica em inglês (ver CLAUDE.md).
+        Nomes dos testes, comentários e mensagens ao utilizador em português de Portugal.
+        Assinala qualquer exceção a um check (v8 ignore, teste desligado, eslint-disable, @ts-ignore,
+        gitleaks:allow, valor de referência subido) sem motivo escrito.
+    - path: 'apps/api/**'
+      instructions: |
+        Multi-organização (ADR-002): todas as tabelas de organização têm organizacao_id e política RLS;
+        o acesso à base passa sempre por withOrganizacao; a organização nunca vem do cliente (corpo,
+        query ou cabeçalho), vem da sessão. Logs e Sentry sem dados pessoais (ADR-006).
+        Endpoint novo ou alterado: testes de integração com o caso normal, sem permissão e outra
+        organização (ADR-005).
+    - path: '.github/workflows/**'
+      instructions: |
+        Permissões mínimas por job, ações fixadas por SHA, persist-credentials: false e nunca
+        pull_request_target. Um check obrigatório nunca é filtrado por caminhos no gatilho (ADR-004).
+
+knowledge_base:
+  code_guidelines:
+    filePatterns:
+      - 'CLAUDE.md'
+      - 'CONTRIBUTING.md'
+      - 'docs/adr/*.md'
