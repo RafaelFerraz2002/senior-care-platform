@@ -99,6 +99,66 @@ describe('findExcecoes', () => {
     expect(findExcecoes(diff)).toEqual([]);
   });
 
+  it('marca um gitleaks:allow em qualquer ficheiro', () => {
+    const diff = [
+      diffDe('config/x.yml', '@@ -1,0 +2,1 @@', ['+token: abc # gitleaks:allow']),
+      diffDe('apps/api/src/x.ts', '@@ -0,0 +1,1 @@', ["+const chave = 'abc'; // gitleaks:allow"]),
+    ].join('\n');
+    expect(findExcecoes(diff)).toEqual([
+      {
+        tipo: 'segredo-ignorado',
+        ficheiro: 'config/x.yml',
+        linha: 2,
+        texto: 'token: abc # gitleaks:allow',
+      },
+      {
+        tipo: 'segredo-ignorado',
+        ficheiro: 'apps/api/src/x.ts',
+        linha: 1,
+        texto: "const chave = 'abc'; // gitleaks:allow",
+      },
+    ]);
+  });
+
+  it('não marca o gitleaks:allow citado entre acentos graves na documentação', () => {
+    const diff = diffDe('CONTRIBUTING.md', '@@ -0,0 +1,1 @@', [
+      '+Um `gitleaks:allow` conta como exceção.',
+    ]);
+    expect(findExcecoes(diff)).toEqual([]);
+  });
+
+  it('marca cada linha acrescentada ao .gitleaksignore', () => {
+    const diff = diffDe('.gitleaksignore', '@@ -0,0 +1,2 @@', [
+      '+abc123:apps/api/src/x.ts:generic-api-key:4',
+      '+def456:e2e/y.ts:generic-api-key:9',
+    ]);
+    expect(findExcecoes(diff)).toEqual([
+      {
+        tipo: 'segredo-ignorado',
+        ficheiro: '.gitleaksignore',
+        linha: 1,
+        texto: 'abc123:apps/api/src/x.ts:generic-api-key:4',
+      },
+      {
+        tipo: 'segredo-ignorado',
+        ficheiro: '.gitleaksignore',
+        linha: 2,
+        texto: 'def456:e2e/y.ts:generic-api-key:9',
+      },
+    ]);
+  });
+
+  it('marca uma só vez a mudança ao .gitleaks.toml', () => {
+    const diff = diffDe('.gitleaks.toml', '@@ -0,0 +1,3 @@', [
+      '+[allowlist]',
+      '+paths = ["e2e/"]',
+      '+regexes = ["abc"]',
+    ]);
+    expect(findExcecoes(diff)).toEqual([
+      { tipo: 'segredo-ignorado', ficheiro: '.gitleaks.toml', linha: 1, texto: '[allowlist]' },
+    ]);
+  });
+
   it('não marca os ficheiros do relatório, que citam os padrões de propósito', () => {
     const diff = [
       diffDe('packages/ci/src/relatorio.ts', '@@ -0,0 +1,1 @@', ['+// eslint-disable']),
