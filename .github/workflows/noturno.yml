@@ -1,4 +1,5 @@
-# Execução noturna sobre o main (#18): e2e nos três browsers e audit das dependências.
+# Execução noturna sobre o main (#18): e2e nos três browsers, audit das dependências
+# e segredos no histórico inteiro (#24).
 # Os nomes dos jobs são estáveis.
 name: Noturno
 
@@ -72,8 +73,26 @@ jobs:
       - uses: ./.github/actions/setup
       - run: pnpm audit --audit-level high
 
+  segredos:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      # Histórico inteiro: as regras do gitleaks mudam e podem apanhar commits antigos.
+      # Imagem oficial do gitleaks, fixada pelo digest. --redact: os registos do CI são públicos.
+      - name: gitleaks
+        run: |
+          # ghcr.io/gitleaks/gitleaks:v8.30.1
+          docker run --rm --user "$(id -u):$(id -g)" \
+            -v "$GITHUB_WORKSPACE:/repo" -w /repo \
+            ghcr.io/gitleaks/gitleaks@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f \
+            git --redact --no-banner -v .
+
   issue:
-    needs: [e2e-browsers, dependencias]
+    needs: [e2e-browsers, dependencias, segredos]
     if: failure()
     runs-on: ubuntu-24.04
     timeout-minutes: 5

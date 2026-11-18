@@ -1,4 +1,4 @@
-# Checks de cada PR (#18). Os nomes dos jobs são estáveis: o ruleset do #24 refere-os.
+# Checks de cada PR (#18; segredos no #24). Os nomes dos jobs são estáveis: o ruleset do #24 refere-os.
 name: CI
 
 on:
@@ -201,6 +201,24 @@ jobs:
           restore-keys: turbo-${{ github.job }}-
       - run: pnpm build
       - run: pnpm check:size
+
+  segredos:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      # Todos os commits do PR, não só o resultado: os intermédios ficam públicos no branch mesmo depois do squash.
+      # Imagem oficial do gitleaks, fixada pelo digest. --redact: os registos do CI são públicos.
+      - name: gitleaks
+        run: |
+          # ghcr.io/gitleaks/gitleaks:v8.30.1
+          docker run --rm --user "$(id -u):$(id -g)" \
+            -v "$GITHUB_WORKSPACE:/repo" -w /repo \
+            ghcr.io/gitleaks/gitleaks@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f \
+            git --redact --no-banner -v --log-opts="origin/main..HEAD" .
 
   relatorio:
     runs-on: ubuntu-24.04
