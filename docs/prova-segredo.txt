@@ -1,0 +1,2 @@
+Prova do #24: segredo inventado, nunca real. Este branch apaga-se sem merge.
+prova_api_key = "Zx9qL2mT8vR4kW7nP3sY6hJ1bC5dF0gA"
